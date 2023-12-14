@@ -19,7 +19,7 @@ public class GamePage extends javax.swing.JFrame {
 
     /**
      * &#064;brief  窗体、组件大小定义，素材大小重塑
-     * &#064;date  2021-10-12 20:00:00
+     * &#064;date  2023-12-15 23:00:00
      */
     private void initParam() {
         // 素材初始化
