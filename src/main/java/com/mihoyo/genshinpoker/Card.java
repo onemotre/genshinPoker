@@ -58,7 +58,25 @@ public class Card {
 
         // TODO:判断牌型
         // 判断牌型
-        if (cards.size() == 1)
+        if (cards.size() == 1) {
+            if (cards.get(0).size() == 1) {
+                return 1;
+            } else if (cards.get(0).size() == 2) {
+                if (cards.get(0).get(0) == 0 && cards.get(0).get(1) == 1) {
+                    return 11;
+                } else {
+                    return 2;
+                }
+            } else if (cards.get(0).size() == 3) {
+                return 3;
+            } else if (cards.get(0).size() == 4) {
+                return 10;
+            } else {
+                return 0;
+            }
+        } else if (cards.size() == 2) {
+
+        }
 
 
     }
