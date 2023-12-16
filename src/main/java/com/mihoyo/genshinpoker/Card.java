@@ -1,10 +1,6 @@
 package com.mihoyo.genshinpoker;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * &#064;ClassName  Card
@@ -78,16 +74,15 @@ public class Card {
     }
 
     /**
-     * @breif  理牌——用于比较与判断牌型
-     * @param _cards
+     * &#064;brief   理牌——用于比较与判断牌型
      * @return 二维数组，子数组中的牌值相同，按照牌的数量进行排序
      */
     private static ArrayList<ArrayList<Integer>> manageCards (ArrayList<Integer> _cards) {
         java.util.Collections.sort(_cards);
         // 理牌：相同牌值的牌放在前面
-        ArrayList<ArrayList<Integer>> cards = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> cards = new ArrayList<>();
         int index = 0;
-        cards.add(new ArrayList<Integer>(Collections.singletonList(_cards.get(0))));
+        cards.add(new ArrayList<>(Collections.singletonList(_cards.get(0))));
         for (Integer card : _cards) {
             if (Objects.equals(card, _cards.get(0))) {
                 continue;
@@ -109,7 +104,8 @@ public class Card {
      * @param _cards 待理的牌
      */
     public static ArrayList<Integer> sortCards (ArrayList<Integer> _cards) {
-        _cards.sort((o1, o2) -> (compareCode(o1, o2) ? -1 : 1)); // 我简直就是个天才
+        _cards.sort((o1, o2) -> (compareCode(o1, o2) ? -1 : ((o1 / 10) == (o2 / 10) ? 0 : 1)));// 我简直就是个天才
+//        _cards.sort((o1, o2) -> (compareCode(o2, o1) ? -1 : 1));
         return _cards;
     }
 
@@ -199,11 +195,16 @@ public class Card {
      * &#064;brief  洗牌
      * @return 返回一组牌
      */
-    public static java.util.ArrayList<Integer> licensing() {
-        java.util.ArrayList<Integer> cards = new java.util.ArrayList<>();
-        cards = allCards;
+    public static java.util.ArrayList<ArrayList<Integer>> licensing(int playerNum) {
+        java.util.ArrayList<Integer> cards;
+        cards = new ArrayList<>(allCardsHash.keySet());
         java.util.Collections.shuffle(cards);
-        return cards;
+
+        ArrayList<ArrayList<Integer>> players = new ArrayList<>();
+        for (int i = 1; i <= playerNum; i++) {
+            players.add(new ArrayList<>(cards.subList((i - 1) * 17, i * 17)));
+        }
+        return players;
     }
 
     /**
@@ -213,10 +214,10 @@ public class Card {
      * @return 牌1是否大于牌2
      */
     public static boolean compareCode(Integer _code1, Integer _code2) {
-        int cardNum1 = allCards.indexOf(_code1) % 13;
-        int cardNum2 = allCards.indexOf(_code2) % 13;
-        cardNum1 = _code1 / 10 == 14 ? 13 : cardNum1;
-        cardNum2 = _code2 / 10 == 14 ? 13 : cardNum2;
+        int cardNum1 = allCardsHash.get(_code1) % 13;
+        int cardNum2 = allCardsHash.get(_code2) % 13;
+        cardNum1 = _code1 / 10 == 14 ? 20 : cardNum1;
+        cardNum2 = _code2 / 10 == 14 ? 20 : cardNum2;
         return cardNum1 > cardNum2;
     }
 
@@ -224,7 +225,7 @@ public class Card {
      * &#064;brief  获取牌名 （用于链接资源文件）
      * @param _code 牌的代号
      * @return 牌名
-     * @note 梅花：m，方块：f，红桃：t，黑桃：h，小王：z0，大王：z1
+     * &#064;note  梅花：m，方块：f，红桃：t，黑桃：h，小王：z0，大王：z1
      */
     public static String getCardName(Integer _code) {
         return name[_code % 10] + String.valueOf(_code / 10 == 14 ? (_code % 10 == 1 ? 1 : 0) : _code / 10);
@@ -232,15 +233,69 @@ public class Card {
 
 
     //////////////// 成员变量 ////////////////
-    private static final ArrayList<Integer> allCards = new ArrayList<>(Arrays.asList(
-            32, 42, 52, 62, 72, 82, 92, 102, 112, 122, 132, 12, 22,
-            33, 43, 53, 63, 73, 83, 93, 103, 113, 123, 133, 13, 23,
-            34, 44, 54, 64, 74, 84, 94, 104, 114, 124, 134, 14, 24,
-            35, 45, 55, 65, 75, 85, 95, 105, 115, 125, 135, 15, 25,
-            140 , 141
-            )); // 所有牌，通过目录可以比较大小
+    private static final HashMap<Integer, Integer> allCardsHash = new HashMap<>() {{
+        put(32, 0);
+        put(42, 1);
+        put(52, 2);
+        put(62, 3);
+        put(72, 4);
+        put(82, 5);
+        put(92, 6);
+        put(102, 7);
+        put(112, 8);
+        put(122, 9);
+        put(132, 10);
+        put(12, 11);
+        put(22, 12);
+        put(33, 13);
+        put(43, 14);
+        put(53, 15);
+        put(63, 16);
+        put(73, 17);
+        put(83, 18);
+        put(93, 19);
+        put(103, 20);
+        put(113, 21);
+        put(123, 22);
+        put(133, 23);
+        put(13, 24);
+        put(23, 25);
+        put(34, 26);
+        put(44, 27);
+        put(54, 28);
+        put(64, 29);
+        put(74, 30);
+        put(84, 31);
+        put(94, 32);
+        put(104, 33);
+        put(114, 34);
+        put(124, 35);
+        put(134, 36);
+        put(14, 37);
+        put(24, 38);
+        put(35, 39);
+        put(45, 40);
+        put(55, 41);
+        put(65, 42);
+        put(75, 43);
+        put(85, 44);
+        put(95, 45);
+        put(105, 46);
+        put(115, 47);
+        put(125, 48);
+        put(135, 49);
+        put(15, 50);
+        put(25, 51);
+        put(140, 52);
+        put(141, 53);
+    }}; // 所有牌，通过哈希表可以比较大小
+
     private static final char[] name = {'z', 'z', 'f', 'm', 't', 'h'}; // 花色
-    private java.util.ArrayList<Integer> cards;
+    private final java.util.ArrayList<Integer> cards;
     // Integer Code = 10 * (牌值) + (花色) 花色：方块个位为2，梅花个位为3，红桃个位为4，黑桃个位为5；牌值：1-13 代表 A-K, 14表示王；个位为0为小王，个位为1为大王,
+
+    public java.util.ArrayList<Integer> getCards() {
+        return cards;
+    }
 
 }

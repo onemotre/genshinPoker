@@ -9,7 +9,13 @@ public class CardTest {
     public static void main(String[] args) {
         ///////////////////// 测试洗牌 ////////////////////
         System.out.println("--------------- 测试洗牌 ---------------");
-
+        ArrayList<ArrayList<Integer>> puke = Card.licensing(3);
+        Card player1 = new Card(puke.get(0));
+        Card player2 = new Card(puke.get(1));
+        Card player3 = new Card(puke.get(2));
+        System.out.println("玩家1：" + Card.sortCards(player1.getCards()));
+        System.out.println("玩家2：" + Card.sortCards(player2.getCards()));
+        System.out.println("玩家3：" + Card.sortCards(player3.getCards()));
         ////////////////////// 测试理牌 //////////////////////
         System.out.println("--------------- 测试理牌 ---------------");
         String sortCardResult = new CardTest().testSortCard();
