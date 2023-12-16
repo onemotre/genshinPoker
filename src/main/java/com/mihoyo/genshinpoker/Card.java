@@ -1,6 +1,8 @@
 package com.mihoyo.genshinpoker;
 
+import java.net.URL;
 import java.util.*;
+
 
 /**
  * &#064;ClassName  Card
@@ -105,7 +107,6 @@ public class Card {
      */
     public static ArrayList<Integer> sortCards (ArrayList<Integer> _cards) {
         _cards.sort((o1, o2) -> (compareCode(o1, o2) ? -1 : ((o1 / 10) == (o2 / 10) ? 0 : 1)));// 我简直就是个天才
-//        _cards.sort((o1, o2) -> (compareCode(o2, o1) ? -1 : 1));
         return _cards;
     }
 
@@ -229,6 +230,9 @@ public class Card {
      */
     public static String getCardName(Integer _code) {
         return name[_code % 10] + String.valueOf(_code / 10 == 14 ? (_code % 10 == 1 ? 1 : 0) : _code / 10);
+    }
+    public static URL getCardPicUrl(Integer _code) {
+        return GamePage.class.getResource("/com/mihoyo/genshinpoker/images/pokerCard/" + getCardName(_code) + ".jpg");
     }
 
 

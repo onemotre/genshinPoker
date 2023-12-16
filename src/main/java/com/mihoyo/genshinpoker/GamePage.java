@@ -1,7 +1,9 @@
 package com.mihoyo.genshinpoker;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Objects;
+
 
 /**
  *
@@ -14,7 +16,8 @@ public class GamePage extends javax.swing.JFrame {
      */
     public GamePage() {
         initParam();
-        initComponents();
+        initComponentsSelf();
+        // initCards();
     }
 
     /**
@@ -43,9 +46,13 @@ public class GamePage extends javax.swing.JFrame {
         this.sizeTopImageHeight = imageBackGround.getWidth(null) * imageTop.getHeight(null) / imageTop.getWidth(null) - 20;
         this.sizeFrameHeight = imageBackGround.getHeight(null) + imageTop.getHeight(null);
 
+        // 主面板大小
+        this.sizeMainPanelWidth = imageBackGround.getWidth(null);
+        this.sizeMainPanelHeight = imageBackGround.getHeight(null);
+
         // 牌面大小
-        this.sizeCardHeight = imageCardBack.getHeight(null) / 10;
-        this.sizeCardWidth = imageCardBack.getWidth(null) / 10;
+        this.sizeCardHeight = imageCardBack.getHeight(null) / 15;
+        this.sizeCardWidth = imageCardBack.getWidth(null) / 15;
 
         // 玩家组件大小
         this.sizePlayerHeight = this.sizeCardHeight + 4;
@@ -79,6 +86,102 @@ public class GamePage extends javax.swing.JFrame {
         // 按钮
         newImage = imageButton.getScaledInstance(this.sizeButtonWidth, this.sizeButtonHeight, java.awt.Image.SCALE_SMOOTH);
         this.iconButton.setImage(newImage);
+    }
+
+    private void initComponentsSelf() {
+        java.awt.GridBagConstraints gridBagConstraints;
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new java.awt.GridBagLayout());
+        this.setIconImage(this.icon.getImage());
+        this.setTitle("GenShinPoker");
+
+        panel_topImage = new javax.swing.JPanel();
+        panel_main = new javax.swing.JPanel();
+        panel_player = new javax.swing.JPanel();
+        panel_playerCom1 = new javax.swing.JPanel();
+        panel_playerCom2 = new javax.swing.JPanel();
+        panel_cardPool = new javax.swing.JPanel();
+        panel_operateArea = new javax.swing.JPanel();
+        button_start = new javax.swing.JButton();
+        button_out = new javax.swing.JButton();
+        button_pass = new javax.swing.JButton();
+        label_topImage = new javax.swing.JLabel();
+        label_background = new javax.swing.JLabel();
+
+        // 初始化panel_topImage
+        panel_topImage.setLayout(new GridBagLayout());
+        panel_topImage.setOpaque(false);
+        // 初始化label_topImage
+        label_topImage.setIcon(this.iconTopImage);
+        label_topImage.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.ipadx = 0;
+        gridBagConstraints.ipady = 0;
+        panel_topImage.add(label_topImage, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        getContentPane().add(panel_topImage, gridBagConstraints);
+
+        ///////////////////////// 初始化panel_main /////////////////////////
+        panel_main.setLayout(new java.awt.GridBagLayout());
+        panel_main.setOpaque(false);
+        panel_main.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 5));
+
+        // TODO: 不使用任何布局了！！！！日你妈的GridBagLayout！！！！
+        // 初始化panel_playerCom1
+        panel_playerCom1.setLayout(new java.awt.BorderLayout());
+        panel_playerCom1.setOpaque(false);
+        panel_playerCom1.setBorder(BorderFactory.createLineBorder(Color.RED, 5));
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.ipadx = this.sizePlayerComWidth;
+        gridBagConstraints.ipady = this.sizePlayerComHeight;
+        panel_main.add(panel_playerCom1, gridBagConstraints);
+
+        // 初始化panel_playerCom2
+        panel_playerCom2.setLayout(new java.awt.BorderLayout());
+        panel_playerCom2.setOpaque(false);
+        panel_playerCom2.setBorder(BorderFactory.createLineBorder(Color.RED, 5));
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.ipadx = this.sizePlayerComWidth;
+        gridBagConstraints.ipady = this.sizePlayerComHeight;
+        panel_main.add(panel_playerCom2, gridBagConstraints);
+
+
+
+        // background picture
+        label_background.setIcon(this.iconBackGround);
+        label_background.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 2;
+        gridBagConstraints.weighty = 2;
+        panel_main.add(label_background, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.ipadx = 0;
+        gridBagConstraints.ipady = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        getContentPane().add(panel_main, gridBagConstraints);
+
+        pack();
     }
 
     /**
@@ -118,21 +221,56 @@ public class GamePage extends javax.swing.JFrame {
 
         panel_main.setLayout(new java.awt.GridBagLayout());
         panel_main.setOpaque(false);
+        panel_main.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 5));
 
         panel_player.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         panel_player.setOpaque(false);
+
+        JLabel test = new JLabel();
+        ImageIcon icon = new ImageIcon(Card.getCardPicUrl(1));
+        Image image = icon.getImage();
+        Image newImage = image.getScaledInstance(this.sizeCardWidth, this.sizeCardHeight, java.awt.Image.SCALE_SMOOTH);
+        icon.setImage(newImage);
+        test.setIcon(icon);
+        test.setSize(this.sizeCardWidth, this.sizeCardHeight);
+        test.setOpaque(false);
+        panel_player.add(test, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, this.sizeCardWidth, this.sizeCardHeight));
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridheight = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         panel_main.add(panel_player, new java.awt.GridBagConstraints());
+        panel_player.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
 
         panel_playerCom1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         panel_playerCom1.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 2;
         panel_main.add(panel_playerCom1, new java.awt.GridBagConstraints());
 
         panel_playerCom2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         panel_playerCom2.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 2;
         panel_main.add(panel_playerCom2, new java.awt.GridBagConstraints());
 
         panel_cardPool.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        panel_cardPool.setOpaque(false);
+        // 显示panel_cardPool的边框
+        panel_cardPool.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 5));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 1;
         panel_main.add(panel_cardPool, new java.awt.GridBagConstraints());
 
         panel_operateArea.setLayout(new java.awt.GridBagLayout());
@@ -184,6 +322,12 @@ public class GamePage extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panel_operateArea.add(button_pass, gridBagConstraints);
 
+        // panel_operateArea 在 panel_main 中的位置
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 1;
         panel_main.add(panel_operateArea, new java.awt.GridBagConstraints());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -207,14 +351,61 @@ public class GamePage extends javax.swing.JFrame {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         getContentPane().add(label_background, gridBagConstraints);
+        pack();
+
+        button_start.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                System.out.println("开始游戏");
+                button_startActionPerformed(evt);
+            }
+        });
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     /**
+     * &#064;brief  初始化牌组
+     * &#064;date  2023-12-17 01:00:00
+     */
+    private void initCards() {
+        ArrayList<ArrayList<Integer>> puke = Card.licensing(3);
+        ArrayList<Integer> player1 = puke.get(0);
+        Card player1Card = new Card(Card.sortCards(player1));
+        ArrayList<Integer> player2 = puke.get(1);
+        Card player2Card = new Card(Card.sortCards(player2));
+        ArrayList<Integer> player3 = puke.get(2);
+        Card player3Card = new Card(Card.sortCards(player3));
+
+        int i = 0;
+        // 初始化玩家组件
+        for (Integer card : player1) {
+            // 根据panel_player的大小计算牌的位置
+            int positionX = (this.sizePlayerWidth / player1Card.getCards().size()) * i;
+            int positionY = this.sizePlayerHeight;
+            JLabel label = new JLabel();
+            // 牌面大小收缩
+            ImageIcon icon = new ImageIcon(Card.getCardPicUrl(card));
+            Image image = icon.getImage();
+            Image newImage = image.getScaledInstance(this.sizeCardWidth, this.sizeCardHeight, java.awt.Image.SCALE_SMOOTH);
+            icon.setImage(newImage);
+            label.setIcon(icon);
+            label.setSize(this.sizeCardWidth, this.sizeCardHeight);
+            label.setOpaque(false);
+            // 向panel_player添加牌，后面的牌可以覆盖前面的牌
+            this.panel_player.add(label, new org.netbeans.lib.awtextra.AbsoluteConstraints(positionX, positionY, this.sizeCardWidth, this.sizeCardHeight));
+            i ++;
+        }
+        pack();
+    }
+
+    private void button_startActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_startActionPerformed
+        // TODO add your handling code here:
+        initCards();
+    }//GEN-LAST:event_button_startActionPerformed
+    /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         /* Set the Nimbus look and feel */
         //<editor-fold default-state="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -245,6 +436,8 @@ public class GamePage extends javax.swing.JFrame {
     private int sizeTopImageHeight;  // 顶部图片高度
     private int sizeFrameWidth;  // 窗体宽度
     private int sizeFrameHeight; // 窗体高度
+    private int sizeMainPanelWidth; // 主面板宽度
+    private int sizeMainPanelHeight;    // 主面板高度
     private int sizeCardPoolWidth;   // 牌池宽度
     private int sizeCardPoolHeight;  // 牌池高度
     private int sizeOperatorWidth;   // 操作区宽度
