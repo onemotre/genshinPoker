@@ -30,8 +30,12 @@ public class Card {
     public static boolean compare(java.util.ArrayList<Integer> _cards1, java.util.ArrayList<Integer> _cards2) {
         int type1 = getType(_cards1);
         int type2 = getType(_cards2);
-        if (type2 == 11) {
+        if (type1 == 0) {
             return false;
+        } else if (type2 == 11) {
+            return false;
+        } else if (type2 == -1) {
+            return true;
         } else if (type1 == 11) {
             return true;
         } else if (type1 != type2 && type1 == 10) {
@@ -83,6 +87,9 @@ public class Card {
      * @return 二维数组，子数组中的牌值相同，按照牌的数量进行排序
      */
     private static ArrayList<ArrayList<Integer>> manageCards (ArrayList<Integer> _cards) {
+        if (_cards.size() == 0) {
+            return new ArrayList<>();
+        }
         java.util.Collections.sort(_cards);
         // 理牌：相同牌值的牌放在前面
         ArrayList<ArrayList<Integer>> cards = new ArrayList<>();
@@ -117,7 +124,7 @@ public class Card {
      * &#064;brief  判断牌型
      * @param _cards 即将打出的牌
      * @return 返回描述牌型的字符串数组
-     * &#064;note   0：不允许出牌，1：单张，2：对子，3：三张，4：三带一，5：三带二，6：四带二，7：顺子，8：连对，9：飞机，10：炸弹，11：王炸
+     * &#064;note   -1 没有出牌， 0：不允许出牌，1：单张，2：对子，3：三张，4：三带一，5：三带二，6：四带二，7：顺子，8：连对，9：飞机，10：炸弹，11：王炸
      */
     public static int getType(java.util.ArrayList<Integer> _cards) {
         // 理牌
@@ -125,7 +132,9 @@ public class Card {
 
         // TODO: 测试牌型
         // 判断牌型
-        if (cards.size() == 1) {
+        if (cards.size() == 0) {
+            return -1;
+        } else if (cards.size() == 1) {
             if (cards.get(0).size() == 1) {
                 // 单张
                 return 1;
@@ -159,7 +168,7 @@ public class Card {
             } else {
                 return 0;
             }
-        } else if (cards.size() >= 3) {
+        } else {
             // Lambda表达式：判断子数组中的牌数是否相同，如果所有组的牌数都相同，则返回true
             boolean numEqual = cards.stream().allMatch(o -> o.size() == cards.get(0).size());
             if (numEqual) {
@@ -174,7 +183,7 @@ public class Card {
                 if (codeEqual && cards.get(0).size() == 2) {
                     // 连对
                     return 8;
-                } else if (codeEqual && cards.get(0).size() == 1) {
+                } else if (codeEqual && cards.get(0).size() == 1 && cards.size() > 3) {
                     // 顺子
                     return 7;
                 } else {
@@ -190,8 +199,6 @@ public class Card {
                 }
                 return 0;
             }
-        } else {
-            return 0;
         }
     }
 
@@ -306,8 +313,16 @@ public class Card {
         this.cards.clear();
         this.cards.addAll(_cards);
     }
+    public void addCard(Integer _card) {
+        this.cards.add(_card);
+    }
     public void deleteCard(Integer _card) {
         this.cards.remove(_card);
+    }
+    public void removeCards(ArrayList<Integer> _cards) {
+        for (Integer card : _cards) {
+            this.cards.remove(card);
+        }
     }
     public int getCardNum() {
         return this.cards.size();

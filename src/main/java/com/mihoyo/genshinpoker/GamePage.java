@@ -55,7 +55,7 @@ public class GamePage extends javax.swing.JFrame {
         this.sizeCardWidth = imageCardBack.getWidth(null) / 15;
 
         // 玩家组件大小
-        this.sizePlayerHeight = this.sizeCardHeight + 10;
+        this.sizePlayerHeight = this.sizeCardHeight + 15;
         this.sizePlayerWidth = this.sizeFrameWidth;
 
         // 按键大小
@@ -67,7 +67,7 @@ public class GamePage extends javax.swing.JFrame {
         this.sizePlayerComWidth = this.sizeCardWidth + 6;
 
         // 操作区大小
-        this.sizeOperatorHeight = this.sizeButtonHeight;
+        this.sizeOperatorHeight = this.sizeButtonHeight + 10;
         this.sizeOperatorWidth = this.sizeFrameWidth - 2 * this.sizePlayerComWidth;
 
         // 牌池大小
@@ -362,6 +362,7 @@ public class GamePage extends javax.swing.JFrame {
     private void initComponentsStart() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         this.setIconImage(this.icon.getImage());
         this.setTitle("GenShinPoker");
 
@@ -377,14 +378,14 @@ public class GamePage extends javax.swing.JFrame {
         // label_topImage
         label_topImage.setIcon(this.iconTopImage);
         label_topImage.setOpaque(false);
-        label_topImage.setBounds(0, 0, this.sizeFrameWidth, this.sizeTopImageHeight);
-        getContentPane().add(label_topImage);
+        getContentPane().add(label_topImage,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0,
+                        this.sizeFrameWidth, this.sizeTopImageHeight));
 
         // panel_operateArea
         panel_operateArea.setLayout(new java.awt.GridLayout());
         GridLayout gridLayout = new GridLayout(1, 1);
         panel_operateArea.setOpaque(false);
-        panel_operateArea.setBounds(this.sizePlayerComWidth, this.sizeTopImageHeight + this.sizeMainPanelHeight / 2, this.sizeOperatorWidth, this.sizeOperatorHeight);
 
         button_start.setIcon(this.iconButton);
         button_start.setText("开始游戏");
@@ -403,15 +404,17 @@ public class GamePage extends javax.swing.JFrame {
         panel_operateArea.add(button_start, gridLayout);
 
         // TODO: 要不要添加作者信息之类的按钮？
-        getContentPane().add(panel_operateArea);
+        getContentPane().add(panel_operateArea,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(this.sizePlayerComWidth,
+                        this.sizeTopImageHeight + this.sizeMainPanelHeight / 2,
+                        this.sizeOperatorWidth, this.sizeOperatorHeight));
 
         // label_background
         label_background.setIcon(this.iconBackGround);
         label_background.setOpaque(false);
-        label_background.setBounds(0, this.sizeTopImageHeight, this.sizeFrameWidth, this.sizeMainPanelHeight);
-        getContentPane().add(label_background);
-
-
+        getContentPane().add(label_background,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(0, this.sizeTopImageHeight,
+                        this.sizeFrameWidth, this.sizeMainPanelHeight));
         pack();
     }
 
@@ -420,10 +423,11 @@ public class GamePage extends javax.swing.JFrame {
      * &#064;date  2023-12-17 15:00:00
      */
     private void initComponentsGame() {
-        // 清楚窗口所有组件
+        // 清除窗口所有组件
         getContentPane().removeAll();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         this.setIconImage(this.icon.getImage());
         this.setTitle("GenShinPoker");
 
@@ -439,68 +443,103 @@ public class GamePage extends javax.swing.JFrame {
         // 渲染卡组
         // 玩家
         updatePlayerPanel();
-        panel_player.setBounds(0, this.sizeTopImageHeight + this.sizePlayerComHeight, this.sizePlayerWidth, this.sizePlayerHeight);
-        panel_player.setBorder(BorderFactory.createLineBorder(Color.CYAN, 5));
-        getContentPane().add(panel_player);
+
         // 电脑玩家1
         panel_playerCom1 = updateComPanel(this.player2Card);
-
         panel_playerCom1.setBorder(BorderFactory.createLineBorder(Color.RED, 5));
-        getContentPane().add(panel_playerCom1);
+        getContentPane().add(panel_playerCom1,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                        0, this.sizeTopImageHeight,
+                        this.sizePlayerComWidth, this.sizePlayerComHeight));
         // 电脑玩家2
         panel_playerCom2 = updateComPanel(this.player3Card);
-        panel_playerCom2.setBounds(this.sizePlayerComWidth + this.sizeCardPoolWidth, this.sizeTopImageHeight, this.sizePlayerComWidth, this.sizePlayerComHeight);
         panel_playerCom2.setBorder(BorderFactory.createLineBorder(Color.RED, 5));
-        getContentPane().add(panel_playerCom2);
+        getContentPane().add(panel_playerCom2,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                        this.sizePlayerComWidth + this.sizeCardPoolWidth, this.sizeTopImageHeight,
+                        this.sizePlayerComWidth, this.sizePlayerComHeight));
 
+        // 操作区渲染
+        panel_operateArea.setLayout(new java.awt.GridLayout());
+        GridLayout gridLayout = new GridLayout(1, 2);
+        panel_operateArea.setOpaque(false);
+
+        button_out.setIcon(this.iconButton);
+        button_out.setText("出牌");
+        button_out.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        button_out.setVerticalTextPosition(SwingConstants.CENTER);
+        button_out.setBorderPainted(false);
+        button_out.setContentAreaFilled(false);
+        button_out.setFocusPainted(false);
+        panel_operateArea.add(button_out, gridLayout);
+        button_out.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                System.out.println("出牌");
+                button_outActionPerformed(evt);
+            }
+        });
+
+        button_pass.setIcon(this.iconButton);
+        button_pass.setText("不出");
+        button_pass.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        button_pass.setVerticalTextPosition(SwingConstants.CENTER);
+        button_pass.setBorderPainted(false);
+        button_pass.setContentAreaFilled(false);
+        button_pass.setFocusPainted(false);
+        panel_operateArea.add(button_pass, gridLayout);
+
+        getContentPane().add(panel_operateArea,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                        this.sizePlayerComWidth, this.sizeTopImageHeight + this.sizeCardPoolHeight,
+                        this.sizeOperatorWidth, this.sizeOperatorHeight));
 
         // 牌池渲染
         panel_cardPool.setOpaque(false);
         panel_cardPool.setLayout(new java.awt.BorderLayout());
-
+        panel_cardPool.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 5));
+        getContentPane().add(panel_cardPool, new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                this.sizePlayerComWidth, this.sizeTopImageHeight,
+                this.sizeCardPoolWidth, this.sizeCardPoolHeight));
 
         // 背景渲染
         label_topImage.setIcon(this.iconTopImage);
         label_topImage.setOpaque(false);
-        label_topImage.setBounds(0, 0, this.sizeFrameWidth, this.sizeTopImageHeight);
-        getContentPane().add(label_topImage);
+        getContentPane().add(label_topImage,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                        0, 0, this.sizeFrameWidth, this.sizeTopImageHeight));
         label_background.setIcon(this.iconBackGround);
         label_background.setOpaque(false);
-        label_background.setBounds(0, this.sizeTopImageHeight, this.sizeFrameWidth, this.sizeMainPanelHeight);
-        getContentPane().add(label_background);
+        getContentPane().add(label_background,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                        0, this.sizeTopImageHeight, this.sizeFrameWidth, this.sizeMainPanelHeight));
 
         pack();
     }
 
 
-    private void button_startActionPerformed(java.awt.event.ActionEvent evt) {
-        // 初始化牌组
-        ArrayList<ArrayList<Integer>> puke = Card.licensing(3);
-        ArrayList<Integer> player1 = puke.get(0);
-        this.player1Card = new Card(Card.sortCards(player1));
-        ArrayList<Integer> player2 = puke.get(1);
-        this.player2Card = new Card(Card.sortCards(player2));
-        ArrayList<Integer> player3 = puke.get(2);
-        this.player3Card = new Card(Card.sortCards(player3));
-
-        initComponentsGame();
-
-    }
-
+    ///////////////////////// 事件逻辑 /////////////////////////
     /**
      * 更新玩家牌组
      */
     private void updatePlayerPanel() {
         javax.swing.JLabel[] player1CardLabel = new javax.swing.JLabel[this.player1Card.getCardNum()];
 
+        // 清除原来panel中的label
+        this.panel_player.removeAll();
         // 渲染玩家的牌
-        this.panel_player.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         this.panel_player.setOpaque(false);
+        this.panel_player.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         for (int i = this.player1Card.getCardNum() - 1; i >= 0; i--) {
             setCardsLabel(player1CardLabel, i);
             int posX = (this.sizeFrameWidth - this.sizeCardShowWidth * 19) / 2 + i * this.sizeCardShowWidth;
-            this.panel_player.add(player1CardLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(posX, 0));
+            this.panel_player.add(player1CardLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(posX, 10));
         }
+        panel_player.setBorder(BorderFactory.createLineBorder(Color.CYAN, 5));
+        getContentPane().add(panel_player,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                        0, this.sizePlayerComHeight + this.sizeTopImageHeight,
+                        this.sizePlayerWidth, this.sizePlayerHeight));
+        panel_player.repaint();
     }
 
     /**
@@ -511,7 +550,6 @@ public class GamePage extends javax.swing.JFrame {
     private javax.swing.JPanel updateComPanel(Card _playerComCard) {
         javax.swing.JPanel panel_playerCom = new javax.swing.JPanel();
         panel_playerCom.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        panel_playerCom1.setBounds(0, this.sizeTopImageHeight, this.sizePlayerComWidth, this.sizePlayerComHeight);
         javax.swing.JLabel[] playerComCardLabel = new javax.swing.JLabel[_playerComCard.getCardNum()];
 
         // 渲染电脑玩家的牌
@@ -534,22 +572,58 @@ public class GamePage extends javax.swing.JFrame {
     }
 
     /**
+     * 出牌逻辑
+     * @param _player   玩家: 1. 玩家; 2. 电脑1; 3. 电脑2
+     * @param _outCards 出的牌（已经经过检验）
+     */
+    private void outCards(int _player, Card _outCards) {
+        // 更新牌池
+        updateCardPool(_player, _outCards);
+
+        this.selectedCards = new Card(new ArrayList<>());
+        this.foreCards = new Card(_outCards.getCards());
+
+        // 玩家处理
+        if (_player == 1) {
+            // 更新玩家牌组
+            this.player1Card.removeCards(_outCards.getCards());
+            System.out.println("玩家手牌：" + this.player1Card.getCards());
+            initComponentsGame();
+        } else if (_player == 2) {
+            this.player2Card.removeCards(_outCards.getCards());
+            this.panel_playerCom1 = updateComPanel(this.player2Card);
+        } else {
+            this.player3Card.removeCards(_outCards.getCards());
+            this.panel_playerCom2 = updateComPanel(this.player3Card);
+        }
+    }
+    /**
      * 更新牌池
      * @param _player 玩家: 1. 玩家; 2. 电脑1; 3. 电脑2
      * @param _outCard 出的牌
      */
     private void updateCardPool(int _player, Card _outCard) {
         javax.swing.JPanel panel_cardOut = new javax.swing.JPanel();
+        panel_cardOut.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         panel_cardOut.setOpaque(false);
 
         javax.swing.JLabel[] cardOutLabel = new javax.swing.JLabel[_outCard.getCardNum()];
-        for (int i = 0; i < _outCard.getCardNum(); i++) {
-            setCardsLabel(cardOutLabel, i);
-            int posX = this.sizeCardShowWidth;
-            cardOutLabel[i].setBounds(posX, 0, this.sizeCardShowWidth, this.sizeCardHeight);
-            panel_cardOut.add(cardOutLabel[i]);
-        }
 
+        for (int i = 0; i < _outCard.getCardNum(); i++) {
+            ImageIcon icon = new ImageIcon(Card.getCardPicUrl(_outCard.getCards().get(i)));
+            Image image = icon.getImage();
+            Image newImage = image.getScaledInstance(this.sizeCardWidth, this.sizeCardHeight, Image.SCALE_SMOOTH);
+            icon.setImage(newImage);
+
+            cardOutLabel[i] = new JLabel();
+            cardOutLabel[i].setIcon(icon);
+            cardOutLabel[i].setSize(this.sizeCardWidth, this.sizeCardHeight);
+            cardOutLabel[i].setOpaque(false);
+
+            int posX = (this.sizeCardPoolWidth - this.sizeCardShowWidth * 19) / 2 + i * this.sizeCardShowWidth;
+            panel_cardOut.add(cardOutLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(posX, 0));
+        }
+        panel_cardOut.setBorder(BorderFactory.createLineBorder(Color.RED, 5));
         if (_player == 1) {
             panel_cardPool.add(panel_cardOut, BorderLayout.LINE_END);
         } else if(_player == 2){
@@ -557,12 +631,14 @@ public class GamePage extends javax.swing.JFrame {
         } else {
             panel_cardPool.add(panel_cardOut, BorderLayout.EAST);
         }
+        panel_cardPool.revalidate();
+        panel_cardPool.repaint();
     }
 
     /**
      * 设置牌的label
-     * @param cardOutLabel
-     * @param i
+     * @param cardOutLabel 等待设置的牌组
+     * @param i 牌的序号
      */
     private void setCardsLabel(JLabel[] cardOutLabel, int i) {
         Integer _code = this.player1Card.getCards().get(i);
@@ -574,8 +650,84 @@ public class GamePage extends javax.swing.JFrame {
         cardOutLabel[i].setIcon(icon);
         cardOutLabel[i].setSize(this.sizeCardWidth, this.sizeCardHeight);
         cardOutLabel[i].setOpaque(false);
+        cardOutLabel[i].addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                System.out.println("点击了牌" + _code);
+                cardOutLabelMouseClicked(evt, _code);
+            }
+        });
     }
 
+    //////////////////////// 处理事件 ////////////////////////
+
+    /**
+     * 开始游戏事件（发牌）
+     */
+    private void button_startActionPerformed(java.awt.event.ActionEvent evt) {
+        // 初始化牌组
+        ArrayList<ArrayList<Integer>> puke = Card.licensing(3);
+        ArrayList<Integer> player1 = puke.get(0);
+        this.player1Card = new Card(Card.sortCards(player1));
+        ArrayList<Integer> player2 = puke.get(1);
+        this.player2Card = new Card(Card.sortCards(player2));
+        ArrayList<Integer> player3 = puke.get(2);
+        this.player3Card = new Card(Card.sortCards(player3));
+
+        System.out.println("玩家手牌：" + this.player1Card.getCards());
+        System.out.println("电脑1手牌：" + this.player2Card.getCards());
+        System.out.println("电脑2手牌：" + this.player3Card.getCards());
+
+        this.foreCards = new Card(new ArrayList<>());
+        this.selectedCards = new Card(new ArrayList<>());
+        this.outCards = new Card(new ArrayList<>());
+
+        initComponentsGame();
+    }
+
+    /**
+     * 出牌事件
+     */
+    private void button_outActionPerformed(java.awt.event.ActionEvent evt) {
+        this.outCards = new Card(selectedCards.getCards());
+        boolean OutAble = Card.compare(this.selectedCards.getCards(), this.foreCards.getCards());
+        if (OutAble) {
+            System.out.println("--------------出牌符合规则--------------");
+            System.out.println("出牌：" + this.outCards.getCards());
+            System.out.println("类型：" + Card.getType(this.outCards.getCards()));
+            System.out.println("上手：" + this.foreCards.getCards());
+            System.out.println("上手类型：" + Card.getType(this.foreCards.getCards()));
+            this.outCards(1, this.selectedCards);
+        } else {
+            System.out.println("--------------出牌不符合规则--------------");
+            // 将所有选中的牌在牌原来的位置上向下移动5个像素
+            for (int i = 0; i < this.selectedCards.getCardNum(); i++) {
+                int originalI = this.player1Card.getCards().indexOf(this.selectedCards.getCards().get(i));
+                int posX = (this.sizeFrameWidth - this.sizeCardShowWidth * 19) / 2 + originalI * this.sizeCardShowWidth;
+                int originIndex = this.panel_player.getComponentZOrder(this.panel_player.getComponent(i));
+                this.panel_player.getComponent(originIndex).setLocation(posX, 10);
+            }
+            selectedCards = new Card(new ArrayList<>());
+        }
+    }
+
+    /**
+     * 点击牌事件
+     *
+     */
+    private void cardOutLabelMouseClicked(java.awt.event.MouseEvent evt, Integer _code) {
+        boolean isSelected = this.selectedCards.getCards().contains(_code);
+        if (isSelected) {
+            // 取消选中
+            this.selectedCards.deleteCard(_code);
+            // 选中的牌向下移动5个像素
+            evt.getComponent().setLocation(evt.getComponent().getX(), evt.getComponent().getY() + 15);
+        } else {
+            // 选中
+            this.selectedCards.addCard(_code);
+            // 选中的牌向上移动5个像素
+            evt.getComponent().setLocation(evt.getComponent().getX(), evt.getComponent().getY() - 15);
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -596,15 +748,19 @@ public class GamePage extends javax.swing.JFrame {
         // 显示：
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GamePage().setVisible(true);
+                GamePage jf = new GamePage();
+                jf.setVisible(true);
             }
         });
     }
 
     ////////////////////////// 逻辑变量 //////////////////////////
-    private Card player1Card;
-    private Card player2Card;
-    private Card player3Card;
+    private Card player1Card;   // 玩家手牌
+    private Card player2Card;   // 电脑玩家手牌
+    private Card player3Card;   // 电脑玩家手牌
+    private Card selectedCards; // 选中的牌
+    private Card foreCards; // 上一次出的牌
+    private Card outCards;  // 出的牌
 
     ////////////////////////// 窗体大小定义 //////////////////////////
     private int sizeTopImageHeight;  // 顶部图片高度
@@ -648,5 +804,4 @@ public class GamePage extends javax.swing.JFrame {
     private javax.swing.JPanel panel_playerCom1;
     private javax.swing.JPanel panel_playerCom2;
     private javax.swing.JPanel panel_topImage;
-    // End of variables declaration//GEN-END:variables
 }
