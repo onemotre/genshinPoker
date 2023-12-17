@@ -19,6 +19,54 @@ public class Card {
     }
 
 
+    // TODO: 在牌堆中找到能出的牌
+    /**
+     *
+     */
+    public Card findOutAble(int _player, Card _foreCards) {
+        int foreType = Card.getType(_foreCards.getCards());
+        Card playerRemain = _player == 2 ? this.cards : this.player3Card;
+        // 特殊情况考虑
+        if (foreType == 7 || foreType == 8 || foreType == 9 || foreType == 11) {
+            // 顺子、连对、飞机、王炸都不出
+            return new Card(new ArrayList<>());
+        } else if (foreType == -1) {
+            // 上家不出
+            return new Card(new ArrayList<>(Collections.singletonList(
+                    playerRemain.getCards().get(playerRemain.getCards().size() - 1))));
+        } else {
+            // 需要遍历已有牌组的情况
+            if (foreType == 1) {
+                // 单张
+                for (int i = 0; i < playerRemain.getCards().size(); i++) {
+                    Card compareCard = new Card(new ArrayList<>(Collections.singletonList(
+                            playerRemain.getCards().get(i))));
+                    if (Card.compare(compareCard.getCards(), this.foreCards.getCards())) {
+                        return new Card(new ArrayList<>(Collections.singletonList(
+                                playerRemain.getCards().get(i))));
+                    }
+                }
+                return new Card(new ArrayList<>());
+            } else if (foreType == 2) {
+                // 对子
+                for (int i = 0; i < playerRemain.getCards().size() - 1; i++) {
+                    Card compareCard = new Card(new ArrayList<>(Arrays.asList(
+                            playerRemain.getCards().get(i), playerRemain.getCards().get(i + 1))));
+                    if (Card.compare(compareCard.getCards(), this.foreCards.getCards())) {
+                        return new Card(new ArrayList<>(Arrays.asList(
+                                playerRemain.getCards().get(i), playerRemain.getCards().get(i + 1))));
+                    }
+                }
+                return new Card(new ArrayList<>());
+            } else if (foreType == 3) {
+                // 三张
+            }
+
+        }
+
+        ArrayList<Integer> highestCards = new ArrayList<>();
+
+    }
 
     //////////////////////// 静态方法 ////////////////////////
     /**

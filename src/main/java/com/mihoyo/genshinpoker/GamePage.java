@@ -2,6 +2,8 @@ package com.mihoyo.genshinpoker;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 
@@ -59,15 +61,17 @@ public class GamePage extends javax.swing.JFrame {
         this.sizePlayerWidth = this.sizeFrameWidth;
 
         // 按键大小
-        this.sizeButtonHeight = imageButton.getHeight(null) / 5;
-        this.sizeButtonWidth = imageButton.getWidth(null) / 5;
+        // 按钮高度
+        int sizeButtonHeight = imageButton.getHeight(null) / 5;
+        // 按钮宽度
+        int sizeButtonWidth = imageButton.getWidth(null) / 5;
 
         // 电脑组件大小
         this.sizePlayerComHeight = this.sizeMainPanelHeight - this.sizePlayerHeight;
         this.sizePlayerComWidth = this.sizeCardWidth + 6;
 
         // 操作区大小
-        this.sizeOperatorHeight = this.sizeButtonHeight + 10;
+        this.sizeOperatorHeight = sizeButtonHeight + 10;
         this.sizeOperatorWidth = this.sizeFrameWidth - 2 * this.sizePlayerComWidth;
 
         // 牌池大小
@@ -88,7 +92,7 @@ public class GamePage extends javax.swing.JFrame {
         newImage = imageCardBack.getScaledInstance(this.sizeCardWidth, this.sizeCardHeight, java.awt.Image.SCALE_SMOOTH);
         this.iconCardBack.setImage(newImage);
         // 按钮
-        newImage = imageButton.getScaledInstance(this.sizeButtonWidth, this.sizeButtonHeight, java.awt.Image.SCALE_SMOOTH);
+        newImage = imageButton.getScaledInstance(sizeButtonWidth, sizeButtonHeight, java.awt.Image.SCALE_SMOOTH);
         this.iconButton.setImage(newImage);
     }
 
@@ -438,7 +442,6 @@ public class GamePage extends javax.swing.JFrame {
         panel_player = new javax.swing.JPanel();
         panel_cardPool = new javax.swing.JPanel();
         panel_operateArea = new javax.swing.JPanel();
-        panel_main = new javax.swing.JPanel();
 
         // 渲染卡组
         // 玩家
@@ -475,6 +478,7 @@ public class GamePage extends javax.swing.JFrame {
         button_out.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 System.out.println("出牌");
+
                 button_outActionPerformed(evt);
             }
         });
@@ -487,6 +491,12 @@ public class GamePage extends javax.swing.JFrame {
         button_pass.setContentAreaFilled(false);
         button_pass.setFocusPainted(false);
         panel_operateArea.add(button_pass, gridLayout);
+        button_pass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                System.out.println("不出");
+                button_passActionPerformed(evt);
+            }
+        });
 
         getContentPane().add(panel_operateArea,
                 new org.netbeans.lib.awtextra.AbsoluteConstraints(
@@ -524,22 +534,26 @@ public class GamePage extends javax.swing.JFrame {
     private void updatePlayerPanel() {
         javax.swing.JLabel[] player1CardLabel = new javax.swing.JLabel[this.player1Card.getCardNum()];
 
-        // 清除原来panel中的label
+//        // 清除原来panel中的label
         this.panel_player.removeAll();
         // 渲染玩家的牌
         this.panel_player.setOpaque(false);
         this.panel_player.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         for (int i = this.player1Card.getCardNum() - 1; i >= 0; i--) {
             setCardsLabel(player1CardLabel, i);
-            int posX = (this.sizeFrameWidth - this.sizeCardShowWidth * 19) / 2 + i * this.sizeCardShowWidth;
-            this.panel_player.add(player1CardLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(posX, 10));
+            int posX = (this.sizeFrameWidth - this.sizeCardShowWidth * this.player1Card.getCardNum()) / 2 + i * this.sizeCardShowWidth;
+            this.panel_player.add(player1CardLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                    posX, 10,
+                    this.sizeCardWidth, this.sizeCardHeight));
         }
         panel_player.setBorder(BorderFactory.createLineBorder(Color.CYAN, 5));
         getContentPane().add(panel_player,
                 new org.netbeans.lib.awtextra.AbsoluteConstraints(
                         0, this.sizePlayerComHeight + this.sizeTopImageHeight,
                         this.sizePlayerWidth, this.sizePlayerHeight));
+        panel_player.revalidate();
         panel_player.repaint();
+        getContentPane().setComponentZOrder(panel_player, 0);
     }
 
     /**
@@ -581,6 +595,7 @@ public class GamePage extends javax.swing.JFrame {
         updateCardPool(_player, _outCards);
 
         this.selectedCards = new Card(new ArrayList<>());
+        this.selectedCardsIndex = new ArrayList<>();
         this.foreCards = new Card(_outCards.getCards());
 
         // 玩家处理
@@ -588,13 +603,18 @@ public class GamePage extends javax.swing.JFrame {
             // 更新玩家牌组
             this.player1Card.removeCards(_outCards.getCards());
             System.out.println("玩家手牌：" + this.player1Card.getCards());
-            initComponentsGame();
+            updatePlayerPanel();
+            System.out.println("玩家手牌更新完成");
         } else if (_player == 2) {
             this.player2Card.removeCards(_outCards.getCards());
             this.panel_playerCom1 = updateComPanel(this.player2Card);
+            this.panel_playerCom1.revalidate();
+            this.panel_playerCom1.repaint();
         } else {
             this.player3Card.removeCards(_outCards.getCards());
             this.panel_playerCom2 = updateComPanel(this.player3Card);
+            this.panel_playerCom2.revalidate();
+            this.panel_playerCom2.repaint();
         }
     }
     /**
@@ -609,7 +629,7 @@ public class GamePage extends javax.swing.JFrame {
 
         javax.swing.JLabel[] cardOutLabel = new javax.swing.JLabel[_outCard.getCardNum()];
 
-        for (int i = 0; i < _outCard.getCardNum(); i++) {
+        for (int i = _outCard.getCardNum()-1; i >= 0; i--) {
             ImageIcon icon = new ImageIcon(Card.getCardPicUrl(_outCard.getCards().get(i)));
             Image image = icon.getImage();
             Image newImage = image.getScaledInstance(this.sizeCardWidth, this.sizeCardHeight, Image.SCALE_SMOOTH);
@@ -620,12 +640,18 @@ public class GamePage extends javax.swing.JFrame {
             cardOutLabel[i].setSize(this.sizeCardWidth, this.sizeCardHeight);
             cardOutLabel[i].setOpaque(false);
 
-            int posX = (this.sizeCardPoolWidth - this.sizeCardShowWidth * 19) / 2 + i * this.sizeCardShowWidth;
-            panel_cardOut.add(cardOutLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(posX, 0));
+            int posX = (this.sizeCardPoolWidth - this.sizeCardShowWidth * outCards.getCardNum()) / 2 + i * this.sizeCardShowWidth;
+            panel_cardOut.add(cardOutLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                    posX, this.sizeCardHeight,
+                    this.sizeCardWidth, this.sizeCardHeight));
+            panel_cardOut.revalidate();
+            panel_cardOut.repaint();
         }
-        panel_cardOut.setBorder(BorderFactory.createLineBorder(Color.RED, 5));
+
         if (_player == 1) {
-            panel_cardPool.add(panel_cardOut, BorderLayout.LINE_END);
+            // 清除原cardPool page_end处的所有组件
+            this.panel_cardPool.removeAll();
+            panel_cardPool.add(panel_cardOut, BorderLayout.PAGE_END);
         } else if(_player == 2){
             panel_cardPool.add(panel_cardOut, BorderLayout.WEST);
         } else {
@@ -653,7 +679,7 @@ public class GamePage extends javax.swing.JFrame {
         cardOutLabel[i].addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 System.out.println("点击了牌" + _code);
-                cardOutLabelMouseClicked(evt, _code);
+                cardOutLabelMouseClicked(evt, _code, i);
             }
         });
     }
@@ -680,6 +706,9 @@ public class GamePage extends javax.swing.JFrame {
         this.foreCards = new Card(new ArrayList<>());
         this.selectedCards = new Card(new ArrayList<>());
         this.outCards = new Card(new ArrayList<>());
+        this.selectedCardsIndex = new ArrayList<>();
+        this.outPower = 2;
+
 
         initComponentsGame();
     }
@@ -688,42 +717,107 @@ public class GamePage extends javax.swing.JFrame {
      * 出牌事件
      */
     private void button_outActionPerformed(java.awt.event.ActionEvent evt) {
+
         this.outCards = new Card(selectedCards.getCards());
         boolean OutAble = Card.compare(this.selectedCards.getCards(), this.foreCards.getCards());
-        if (OutAble) {
-            System.out.println("--------------出牌符合规则--------------");
-            System.out.println("出牌：" + this.outCards.getCards());
-            System.out.println("类型：" + Card.getType(this.outCards.getCards()));
-            System.out.println("上手：" + this.foreCards.getCards());
-            System.out.println("上手类型：" + Card.getType(this.foreCards.getCards()));
-            this.outCards(1, this.selectedCards);
-        } else {
-            System.out.println("--------------出牌不符合规则--------------");
-            // 将所有选中的牌在牌原来的位置上向下移动5个像素
-            for (int i = 0; i < this.selectedCards.getCardNum(); i++) {
-                int originalI = this.player1Card.getCards().indexOf(this.selectedCards.getCards().get(i));
-                int posX = (this.sizeFrameWidth - this.sizeCardShowWidth * 19) / 2 + originalI * this.sizeCardShowWidth;
-                int originIndex = this.panel_player.getComponentZOrder(this.panel_player.getComponent(i));
-                this.panel_player.getComponent(originIndex).setLocation(posX, 10);
+
+        if (outPower % 3 == 1) {
+            // 玩家出牌
+            if (OutAble) {
+                System.out.println("--------------玩家出牌--------------");
+                System.out.println("出牌：" + this.outCards.getCards());
+                System.out.println("类型：" + Card.getType(this.outCards.getCards()));
+                System.out.println("上手：" + this.foreCards.getCards());
+                System.out.println("上手类型：" + Card.getType(this.foreCards.getCards()));
+                this.outCards(1, this.selectedCards);
+            } else {
+                System.out.println("--------------出牌不符合规则--------------");
+                // 将所有选中的牌在牌原来的位置上向下移动5个像素
+                for (int i = 0; i < this.selectedCardsIndex.size(); i++) {
+                    panel_player.getComponent(this.selectedCardsIndex.get(i)).setLocation(
+                            panel_player.getComponent(i).getX(), panel_player.getComponent(i).getY() + 15);
+                    panel_player.revalidate();
+                    panel_player.repaint();
+                }
+                selectedCards = new Card(new ArrayList<>());
+                selectedCardsIndex = new ArrayList<>();
             }
-            selectedCards = new Card(new ArrayList<>());
+
+        } else {
+            // 电脑出牌
+            System.out.println("----------------电脑出牌----------------");
+            // 选取一张能出的牌，如果不能找到能出的牌，则牌权不变
+            boolean findOutAble = false;
+            for (int i = 0; i < this.player2Card.getCardNum(); i++) {
+                this.outCards = new Card(new ArrayList<>(Collections.singletonList(
+                        this.player2Card.getCards().get(i))));
+                if (Card.compare(this.outCards.getCards(), this.foreCards.getCards())) {
+                    findOutAble = true;
+                    break;
+                }
+            }
+            if (findOutAble) {
+                if (outPower == 2) {
+                    this.outCards = new Card(new ArrayList<>(Collections.singletonList(
+                            this.player2Card.getCards().get(this.player2Card.getCardNum() - 1))));
+                    this.outCards(2, this.outCards);
+                    if (this.player2Card.getCardNum() == 0) {
+                        System.out.println("电脑1获胜");
+                        // TODO: 写一个弹窗，显示电脑1获胜
+                        // 退出游戏
+                        System.exit(0);
+                    }
+                } else {
+                    this.outCards = new Card(new ArrayList<>(Collections.singletonList(
+                            this.player3Card.getCards().get(this.player3Card.getCardNum() - 1))));
+                    this.outCards(3, this.outCards);
+                    if (this.player3Card.getCardNum() == 0) {
+                        System.out.println("电脑2获胜");
+                        System.exit(0);
+                    }
+                }
+            }
+
         }
+
+
+    }
+
+    /**
+     * 不出事件
+     */
+    private void button_passActionPerformed(java.awt.event.ActionEvent evt) {
+        System.out.println("--------------不出--------------");
+        // 将选中的牌向下移动5个像素
+        for (int i = 0; i < this.selectedCardsIndex.size(); i++) {
+            panel_player.getComponent(this.selectedCardsIndex.get(i)).setLocation(
+                    panel_player.getComponent(i).getX(), panel_player.getComponent(i).getY() + 15);
+            panel_player.revalidate();
+            panel_player.repaint();
+        }
+        this.panel_player.revalidate();
+        this.panel_player.repaint();
+        this.selectedCards = new Card(new ArrayList<>());
+        this.selectedCardsIndex = new ArrayList<>();
     }
 
     /**
      * 点击牌事件
      *
      */
-    private void cardOutLabelMouseClicked(java.awt.event.MouseEvent evt, Integer _code) {
+    private void cardOutLabelMouseClicked(java.awt.event.MouseEvent evt, Integer _code, int _i) {
         boolean isSelected = this.selectedCards.getCards().contains(_code);
         if (isSelected) {
             // 取消选中
             this.selectedCards.deleteCard(_code);
+            this.selectedCardsIndex.remove((Integer) _i);
             // 选中的牌向下移动5个像素
             evt.getComponent().setLocation(evt.getComponent().getX(), evt.getComponent().getY() + 15);
         } else {
             // 选中
             this.selectedCards.addCard(_code);
+            // 记录选中的牌的序号
+            this.selectedCardsIndex.add((Integer) _i);
             // 选中的牌向上移动5个像素
             evt.getComponent().setLocation(evt.getComponent().getX(), evt.getComponent().getY() - 15);
         }
@@ -755,10 +849,12 @@ public class GamePage extends javax.swing.JFrame {
     }
 
     ////////////////////////// 逻辑变量 //////////////////////////
+    private int outPower;   // 出牌权
     private Card player1Card;   // 玩家手牌
     private Card player2Card;   // 电脑玩家手牌
     private Card player3Card;   // 电脑玩家手牌
     private Card selectedCards; // 选中的牌
+    private ArrayList<Integer> selectedCardsIndex; // 选中的牌的序号
     private Card foreCards; // 上一次出的牌
     private Card outCards;  // 出的牌
 
@@ -778,8 +874,6 @@ public class GamePage extends javax.swing.JFrame {
     private int sizeCardHeight;  // 牌高度
     private int sizePlayerComWidth;  // 玩家组件宽度
     private int sizePlayerComHeight;  // 玩家组件高度
-    private int sizeButtonWidth; // 按钮宽度
-    private int sizeButtonHeight;    // 按钮高度
     private int sizePlayerWidth; // 玩家宽度
     private int sizePlayerHeight;    // 玩家高度
 
@@ -798,10 +892,8 @@ public class GamePage extends javax.swing.JFrame {
     private javax.swing.JLabel label_background;
     private javax.swing.JLabel label_topImage;
     private javax.swing.JPanel panel_cardPool;
-    private javax.swing.JPanel panel_main;
     private javax.swing.JPanel panel_operateArea;
     private javax.swing.JPanel panel_player;
     private javax.swing.JPanel panel_playerCom1;
     private javax.swing.JPanel panel_playerCom2;
-    private javax.swing.JPanel panel_topImage;
 }
