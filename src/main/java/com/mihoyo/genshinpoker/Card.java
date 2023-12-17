@@ -11,6 +11,9 @@ import java.util.*;
  */
 public class Card {
 
+    public Card() {
+        this.cards = new ArrayList<>();
+    }
     public Card(java.util.ArrayList<Integer> _cards) {
         this.cards = _cards;
     }
@@ -222,19 +225,6 @@ public class Card {
         return cardNum1 > cardNum2;
     }
 
-    /**
-     * &#064;brief  获取牌名 （用于链接资源文件）
-     * @param _code 牌的代号
-     * @return 牌名
-     * &#064;note  梅花：m，方块：f，红桃：t，黑桃：h，小王：z0，大王：z1
-     */
-    public static String getCardName(Integer _code) {
-        return name[_code % 10] + String.valueOf(_code / 10 == 14 ? (_code % 10 == 1 ? 1 : 0) : _code / 10);
-    }
-    public static URL getCardPicUrl(Integer _code) {
-        return GamePage.class.getResource("/com/mihoyo/genshinpoker/images/pokerCard/" + getCardName(_code) + ".jpg");
-    }
-
 
     //////////////// 成员变量 ////////////////
     private static final HashMap<Integer, Integer> allCardsHash = new HashMap<>() {{
@@ -298,8 +288,31 @@ public class Card {
     private final java.util.ArrayList<Integer> cards;
     // Integer Code = 10 * (牌值) + (花色) 花色：方块个位为2，梅花个位为3，红桃个位为4，黑桃个位为5；牌值：1-13 代表 A-K, 14表示王；个位为0为小王，个位为1为大王,
 
+
+    //////////////////////// set-get method ////////////////////////
+    /**
+     * &#064;brief  获取牌名 （用于链接资源文件）
+     * @param _code 牌的代号
+     * @return 牌名
+     * &#064;note  梅花：m，方块：f，红桃：t，黑桃：h，小王：z0，大王：z1
+     */
+    public static String getCardName(Integer _code) {
+        return name[_code % 10] + String.valueOf((_code / 10) == 14 ? _code % 10 : _code / 10);
+    }
+    public static URL getCardPicUrl(Integer _code) {
+        return GamePage.class.getResource("/com/mihoyo/genshinpoker/images/pokerCard/" + getCardName(_code) + ".jpg");
+    }
+    public void setCard(ArrayList<Integer> _cards) {
+        this.cards.clear();
+        this.cards.addAll(_cards);
+    }
+    public void deleteCard(Integer _card) {
+        this.cards.remove(_card);
+    }
+    public int getCardNum() {
+        return this.cards.size();
+    }
     public java.util.ArrayList<Integer> getCards() {
         return cards;
     }
-
 }
