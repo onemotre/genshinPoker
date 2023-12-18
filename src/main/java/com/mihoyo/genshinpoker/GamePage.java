@@ -579,6 +579,7 @@ public class GamePage extends javax.swing.JFrame {
             int posY = (this.sizePlayerComHeight - this.sizeCardShowHeight * 19) / 2 + i * this.sizeCardShowHeight;
             panel_playerCom.add(playerComCardLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(0, posY));
         }
+        System.out.println("电脑手牌更新成功");
         return panel_playerCom;
     }
 
@@ -605,6 +606,7 @@ public class GamePage extends javax.swing.JFrame {
      * @param _outCard 出的牌
      */
     private void updateCardPool(int _player, Card _outCard) {
+
         javax.swing.JPanel panel_cardOut = new javax.swing.JPanel();
         panel_cardOut.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         panel_cardOut.setOpaque(false);
@@ -622,7 +624,7 @@ public class GamePage extends javax.swing.JFrame {
             cardOutLabel[i].setSize(this.sizeCardWidth, this.sizeCardHeight);
             cardOutLabel[i].setOpaque(false);
 
-            int posX = (this.sizeCardPoolWidth - this.sizeCardShowWidth * outCards.getCardNum()) / 2 + i * this.sizeCardShowWidth;
+            int posX = i * this.sizeCardShowWidth;
             panel_cardOut.add(cardOutLabel[i], new org.netbeans.lib.awtextra.AbsoluteConstraints(
                     posX, this.sizeCardHeight,
                     this.sizeCardWidth, this.sizeCardHeight));
@@ -635,8 +637,10 @@ public class GamePage extends javax.swing.JFrame {
             this.panel_cardPool.removeAll();
             panel_cardPool.add(panel_cardOut, BorderLayout.PAGE_END);
         } else if(_player == 2){
+            this.panel_cardPool.removeAll();
             panel_cardPool.add(panel_cardOut, BorderLayout.WEST);
         } else {
+            this.panel_cardPool.removeAll();
             panel_cardPool.add(panel_cardOut, BorderLayout.EAST);
         }
         panel_cardPool.revalidate();
@@ -717,9 +721,20 @@ public class GamePage extends javax.swing.JFrame {
                     // 在this.player2Card中删除这些牌
                     this.player2Card.removeCards(outCard.getCards());
                     // 更新电脑玩家1的牌组
+                    this.panel_playerCom1.removeAll();
+                    System.out.println("电脑2剩余手牌：" + this.player3Card.getCards().size());
                     this.panel_playerCom1 = updateComPanel(this.player2Card);
                     panel_playerCom1.revalidate();
                     panel_playerCom1.repaint();
+                    getContentPane().add(panel_playerCom1,
+                            new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                                    0, this.sizeTopImageHeight,
+                                    this.sizePlayerComWidth, this.sizePlayerComHeight));
+                    getContentPane().setComponentZOrder(panel_playerCom1, 0);
+                    if (this.player2Card.getCardNum() == 0) {
+                        System.out.println("电脑1胜利");
+                        System.exit(0);
+                    }
 
                     // 在牌池中添加这些牌
                     updateCardPool(2, outCard);
@@ -751,9 +766,20 @@ public class GamePage extends javax.swing.JFrame {
                     // 在this.player3Card中删除这些牌
                     this.player3Card.removeCards(outCard.getCards());
                     // 更新电脑玩家2的牌组
+                    this.panel_playerCom2.removeAll();
+                    System.out.println("电脑2剩余手牌：" + this.player3Card.getCards().size());
                     this.panel_playerCom2 = updateComPanel(this.player3Card);
                     panel_playerCom2.revalidate();
                     panel_playerCom2.repaint();
+                    getContentPane().add(panel_playerCom2,
+                            new org.netbeans.lib.awtextra.AbsoluteConstraints(
+                                    0, this.sizeTopImageHeight,
+                                    this.sizePlayerComWidth, this.sizePlayerComHeight));
+                    getContentPane().setComponentZOrder(panel_playerCom2, 0);
+                    if (this.player3Card.getCards().size() == 0) {
+                        System.out.println("电脑2胜利");
+                        System.exit(0);
+                    }
 
                     // 在牌池中添加这些牌
                     updateCardPool(3, outCard);
@@ -825,6 +851,11 @@ public class GamePage extends javax.swing.JFrame {
                 this.outPower++;
                 this.lastOut = 1;
                 this.passNum = 0;
+
+                if (this.player1Card.getCards().size() == 0) {
+                    System.out.println("玩家胜利");
+                    System.exit(0);
+                }
 
                 // 触发电脑出牌
                 playerComOut();
