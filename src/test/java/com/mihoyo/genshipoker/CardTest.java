@@ -285,7 +285,7 @@ public class CardTest {
     }
     private String testFindOutAble() {
         ArrayList<Integer> cards = new ArrayList<>(Arrays.asList(
-                141,
+                140,
                 22,
                 12,
                 132, 133, 134, 135,
@@ -306,8 +306,19 @@ public class CardTest {
             foreCards = new ArrayList<>(Arrays.asList(i * 10 + 3));
             Card foreCard = new Card(foreCards);
             if (card.findOutAble(foreCard).getCardNum() != 1) {
-                return "单张出牌错误";
+                return "单张1出牌错误";
             }
+        }
+        foreCards = new ArrayList<>(Arrays.asList(141));
+        Card forCard = new Card(foreCards);
+        if (card.findOutAble(forCard).getCardNum() != 0) {
+            return "单张2出牌错误";
+        }
+        // 2. 对子
+        foreCards = new ArrayList<>(Arrays.asList(93, 94));
+        forCard = new Card(foreCards);
+        if (card.findOutAble(forCard).getCardNum() != 2) {
+            return "对子出牌错误";
         }
 
     }
