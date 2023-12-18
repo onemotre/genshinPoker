@@ -21,11 +21,12 @@ public class Card {
 
     // TODO: 在牌堆中找到能出的牌
     /**
-     *
+     * 在当前牌组中找到能出的牌
+     * @param _foreCards 上一手牌
+     * @return 能出的牌; 如果没有牌能出，则返回空牌
      */
-    public Card findOutAble(int _player, Card _foreCards) {
+    public Card findOutAble( Card _foreCards) {
         int foreType = Card.getType(_foreCards.getCards());
-        Card playerRemain = _player == 2 ? this.cards : this.player3Card;
         // 特殊情况考虑
         if (foreType == 7 || foreType == 8 || foreType == 9 || foreType == 11) {
             // 顺子、连对、飞机、王炸都不出
@@ -33,39 +34,115 @@ public class Card {
         } else if (foreType == -1) {
             // 上家不出
             return new Card(new ArrayList<>(Collections.singletonList(
-                    playerRemain.getCards().get(playerRemain.getCards().size() - 1))));
+                    this.cards.get(this.cards.size() - 1))));
         } else {
             // 需要遍历已有牌组的情况
             if (foreType == 1) {
                 // 单张
-                for (int i = 0; i < playerRemain.getCards().size(); i++) {
+                for (int i = 0; i < this.cards.size(); i++) {
                     Card compareCard = new Card(new ArrayList<>(Collections.singletonList(
-                            playerRemain.getCards().get(i))));
-                    if (Card.compare(compareCard.getCards(), this.foreCards.getCards())) {
+                            this.cards.get(i))));
+                    if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
                         return new Card(new ArrayList<>(Collections.singletonList(
-                                playerRemain.getCards().get(i))));
+                                this.cards.get(i))));
                     }
                 }
                 return new Card(new ArrayList<>());
             } else if (foreType == 2) {
                 // 对子
-                for (int i = 0; i < playerRemain.getCards().size() - 1; i++) {
+                for (int i = 0; i < this.cards.size() - 1; i++) {
                     Card compareCard = new Card(new ArrayList<>(Arrays.asList(
-                            playerRemain.getCards().get(i), playerRemain.getCards().get(i + 1))));
-                    if (Card.compare(compareCard.getCards(), this.foreCards.getCards())) {
+                            this.cards.get(i), this.cards.get(i + 1))));
+                    if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
                         return new Card(new ArrayList<>(Arrays.asList(
-                                playerRemain.getCards().get(i), playerRemain.getCards().get(i + 1))));
+                                this.cards.get(i), this.cards.get(i + 1))));
                     }
                 }
                 return new Card(new ArrayList<>());
             } else if (foreType == 3) {
                 // 三张
+                for (int i = 0; i < this.cards.size() - 2; i++) {
+                    Card compareCard = new Card(new ArrayList<>(Arrays.asList(
+                            this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2))));
+                    if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
+                        return new Card(new ArrayList<>(Arrays.asList(
+                                this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2))));
+                    }
+                }
+                return new Card(new ArrayList<>());
+            } else if (foreType == 4) {
+                // 三带一
+                for (int i = 0; i < this.cards.size() - 2; i++) {
+                    Card compareCard = new Card(new ArrayList<>(Arrays.asList(
+                            this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2))));
+                    if (Card.getType(compareCard.getCards()) == 3) {
+                        for (int j = 0; j < this.cards.size(); j++) {
+                            if (j == i || j == i + 1 || j == i + 2) {
+                                continue;
+                            }
+                            compareCard.addCard(this.cards.get(j));
+                            if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
+                                return compareCard;
+                            }
+                        }
+
+                    }
+                }
+                return new Card(new ArrayList<>());
+            } else if (foreType == 5) {
+                // 三带二
+                for (int i = 0; i < this.cards.size() - 2; i++) {
+                    Card compareCard = new Card(new ArrayList<>(Arrays.asList(
+                            this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2))));
+                    if (Card.getType(compareCard.getCards()) == 3) {
+                        for (int j = 0; j < this.cards.size() - 1; j++) {
+                            if (j == i || j == i + 1 || j == i + 2) {
+                                continue;
+                            }
+                            if (Card.getType(new ArrayList<>(Arrays.asList(this.cards.get(j), this.cards.get(j + 1)))) == 2) {
+                                compareCard.addCard(this.cards.get(j));
+                                compareCard.addCard(this.cards.get(j + 1));
+                                if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
+                                    return compareCard;
+                                }
+                            }
+                        }
+                    }
+                }
+                return new Card(new ArrayList<>());
+            } else if (foreType == 6) {
+                // 四带二
+                for (int i = 0; i < this.cards.size() - 3; i++) {
+                    Card compareCard = new Card(new ArrayList<>(Arrays.asList(
+                            this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2), this.cards.get(i + 3))));
+                    if (Card.getType(compareCard.getCards()) == 3) {
+                        for (int j = 0; j < this.cards.size() - 1; j++) {
+                            if (j == i || j == i + 1 || j == i + 2 || j == i + 3) {
+                                continue;
+                            }
+                            if (Card.getType(new ArrayList<>(Arrays.asList(this.cards.get(j), this.cards.get(j + 1)))) == 2) {
+                                compareCard.addCard(this.cards.get(j));
+                                compareCard.addCard(this.cards.get(j + 1));
+                                if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
+                                    return compareCard;
+                                }
+                            }
+                        }
+                    }
+                }
+                return new Card(new ArrayList<>());
+            } else {
+                // 是否有炸弹
+                for (int i = 0; i < this.cards.size() - 3; i++) {
+                    Card compareCard = new Card(new ArrayList<>(Arrays.asList(
+                            this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2), this.cards.get(i + 3))));
+                    if (Card.getType(compareCard.getCards()) == 10) {
+                        return compareCard;
+                    }
+                }
+                return new Card(new ArrayList<>());
             }
-
         }
-
-        ArrayList<Integer> highestCards = new ArrayList<>();
-
     }
 
     //////////////////////// 静态方法 ////////////////////////

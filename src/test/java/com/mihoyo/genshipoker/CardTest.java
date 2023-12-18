@@ -283,4 +283,32 @@ public class CardTest {
         }
         return "牌比较测试通过";
     }
+    private String testFindOutAble() {
+        ArrayList<Integer> cards = new ArrayList<>(Arrays.asList(
+                141,
+                22,
+                12,
+                132, 133, 134, 135,
+                122, 123,
+                102, 103, 104, 92,
+                82,
+                72,
+                62,
+                52,
+                42,
+                32
+        ));
+        ArrayList<Integer> foreCards = new ArrayList<>();
+        Card card = new Card(cards);
+
+        // 1.单张
+        for (int i = 1; i <= 13; i++) {
+            foreCards = new ArrayList<>(Arrays.asList(i * 10 + 3));
+            Card foreCard = new Card(foreCards);
+            if (card.findOutAble(foreCard).getCardNum() != 1) {
+                return "单张出牌错误";
+            }
+        }
+
+    }
 }
