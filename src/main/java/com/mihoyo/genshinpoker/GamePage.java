@@ -491,7 +491,6 @@ public class GamePage extends javax.swing.JFrame {
         panel_operateArea.add(button_pass, gridLayout);
         button_pass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                System.out.println("不出");
                 button_passActionPerformed(evt);
             }
         });
@@ -674,6 +673,7 @@ public class GamePage extends javax.swing.JFrame {
      */
     private void checkOutPlayer(int _passNum) {
         if (_passNum == 2) {
+            this.foreCards = new Card(new ArrayList<>());
             if (this.lastOut == 1) {
             } else if (this.lastOut == 2) {
                 this.outPower = 2;
@@ -866,16 +866,8 @@ public class GamePage extends javax.swing.JFrame {
         this.selectedCardsIndex = new ArrayList<>();
 
         // 更新逻辑
-        this.outPower++;
+        this.outPower = 2;
         checkOutPlayer(++this.passNum);
-        if (this.passNum == 2) {
-            this.foreCards = new Card(new ArrayList<>());
-
-            outPower = lastOut;
-            playerComOut();
-        } else {
-            playerComOut();
-        }
     }
 
     /**
