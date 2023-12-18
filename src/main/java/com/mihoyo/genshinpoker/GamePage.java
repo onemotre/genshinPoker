@@ -2,8 +2,6 @@ package com.mihoyo.genshinpoker;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 
 
@@ -392,7 +390,7 @@ public class GamePage extends javax.swing.JFrame {
         panel_operateArea.setOpaque(false);
 
         button_start.setIcon(this.iconButton);
-        button_start.setText("开始游戏");
+        button_start.setText("发牌");
         button_start.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         button_start.setVerticalTextPosition(SwingConstants.CENTER);
         button_start.setBorderPainted(false);
@@ -401,7 +399,7 @@ public class GamePage extends javax.swing.JFrame {
         // 游戏界面入口
         button_start.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                System.out.println("开始游戏");
+                System.out.println("发牌");
                 button_startActionPerformed(evt);
             }
         });
@@ -587,35 +585,20 @@ public class GamePage extends javax.swing.JFrame {
 
     /**
      * 出牌逻辑
-     * @param _player   玩家: 1. 玩家; 2. 电脑1; 3. 电脑2
      * @param _outCards 出的牌（已经经过检验）
      */
-    private void outCards(int _player, Card _outCards) {
+    private void outPlayerCards(Card _outCards) {
         // 更新牌池
-        updateCardPool(_player, _outCards);
+        updateCardPool(1, _outCards);
 
         this.selectedCards = new Card(new ArrayList<>());
         this.selectedCardsIndex = new ArrayList<>();
         this.foreCards = new Card(_outCards.getCards());
 
-        // 玩家处理
-        if (_player == 1) {
-            // 更新玩家牌组
-            this.player1Card.removeCards(_outCards.getCards());
-            System.out.println("玩家手牌：" + this.player1Card.getCards());
-            updatePlayerPanel();
-            System.out.println("玩家手牌更新完成");
-        } else if (_player == 2) {
-            this.player2Card.removeCards(_outCards.getCards());
-            this.panel_playerCom1 = updateComPanel(this.player2Card);
-            this.panel_playerCom1.revalidate();
-            this.panel_playerCom1.repaint();
-        } else {
-            this.player3Card.removeCards(_outCards.getCards());
-            this.panel_playerCom2 = updateComPanel(this.player3Card);
-            this.panel_playerCom2.revalidate();
-            this.panel_playerCom2.repaint();
-        }
+        this.player1Card.removeCards(_outCards.getCards());
+        System.out.println("玩家手牌：" + this.player1Card.getCards());
+        updatePlayerPanel();
+        System.out.println("玩家手牌更新完成");
     }
     /**
      * 更新牌池
@@ -684,6 +667,113 @@ public class GamePage extends javax.swing.JFrame {
         });
     }
 
+    /**
+     * 判断现在谁出牌
+     * @param _passNum
+     * @return
+     */
+    private void checkOutPlayer(int _passNum) {
+        if (_passNum == 2) {
+            if (this.lastOut == 1) {
+            } else if (this.lastOut == 2) {
+                this.outPower = 2;
+                playerComOut();
+            } else if (this.lastOut == 3) {
+                this.outPower = 3;
+                playerComOut();
+            } else {
+                System.out.println("出牌错误");
+            }
+        } else {
+            if (this.outPower % 3 == 1) {
+                // 玩家出牌
+                System.out.println("--------------玩家出牌--------------");
+            } else {
+                playerComOut();
+            }
+        }
+    }
+    /**
+     * 控制出牌流
+     */
+    private void playerComOut() {
+            // 电脑出牌
+
+            Card outCard = new Card();
+
+            if (this.outPower % 3 == 2) {
+                // playerCard2
+                System.out.println("----------------电脑1出牌----------------");
+                outCard = this.player2Card.findOutAble(this.foreCards);
+                if (outCard.getCards().size() == 0) {
+                    // 不出
+                    System.out.println("电脑1不出");
+                    this.outPower++;
+                    checkOutPlayer(++this.passNum);
+                    playerComOut();
+                } else {
+                    // 出牌
+                    System.out.println("电脑1出牌：" + outCard.getCards());
+                    // 在this.player2Card中删除这些牌
+                    this.player2Card.removeCards(outCard.getCards());
+                    // 更新电脑玩家1的牌组
+                    this.panel_playerCom1 = updateComPanel(this.player2Card);
+                    panel_playerCom1.revalidate();
+                    panel_playerCom1.repaint();
+
+                    // 在牌池中添加这些牌
+                    updateCardPool(2, outCard);
+                    this.panel_cardPool.revalidate();
+                    this.panel_cardPool.repaint();
+
+                    this.foreCards = new Card(outCard.getCards());
+
+                    // 更新逻辑进程
+                    this.outPower++;
+                    this.lastOut = 2;
+                    this.passNum = 0;
+                    playerComOut();
+
+                }
+            } else if (this.outPower % 3 == 0) {
+                // playerCard3
+                System.out.println("----------------电脑2出牌----------------");
+                outCard = this.player3Card.findOutAble(this.foreCards);
+                if (outCard.getCards().size() == 0) {
+                    // 不出
+                    System.out.println("电脑2不出");
+                    this.outPower++;
+                    checkOutPlayer(++this.passNum);
+                    playerComOut();
+                } else {
+                    // 出牌
+                    System.out.println("电脑2出牌：" + outCard.getCards());
+                    // 在this.player3Card中删除这些牌
+                    this.player3Card.removeCards(outCard.getCards());
+                    // 更新电脑玩家2的牌组
+                    this.panel_playerCom2 = updateComPanel(this.player3Card);
+                    panel_playerCom2.revalidate();
+                    panel_playerCom2.repaint();
+
+                    // 在牌池中添加这些牌
+                    updateCardPool(3, outCard);
+                    this.panel_cardPool.revalidate();
+                    this.panel_cardPool.repaint();
+
+                    this.foreCards = new Card(outCard.getCards());
+
+                    // 更新逻辑进程
+                    this.outPower++;
+                    this.lastOut = 3;
+                    this.passNum = 0;
+                    playerComOut();
+
+                }
+            } else {
+                System.out.println("--------------玩家出牌--------------");
+            }
+    }
+
     //////////////////////// 处理事件 ////////////////////////
 
     /**
@@ -707,31 +797,42 @@ public class GamePage extends javax.swing.JFrame {
         this.selectedCards = new Card(new ArrayList<>());
         this.outCards = new Card(new ArrayList<>());
         this.selectedCardsIndex = new ArrayList<>();
-        this.outPower = 2;
+        this.outPower = 1;
 
 
         initComponentsGame();
     }
 
     /**
-     * 出牌事件
+     * 玩家出牌事件
      */
     private void button_outActionPerformed(java.awt.event.ActionEvent evt) {
 
         this.outCards = new Card(selectedCards.getCards());
         boolean OutAble = Card.compare(this.selectedCards.getCards(), this.foreCards.getCards());
 
-        if (outPower % 3 == 1) {
+        // 判断这个回合谁出牌
+        if (outPower % 3 == 1 || (passNum == 2 && lastOut == 1)) {
             // 玩家出牌
             if (OutAble) {
-                System.out.println("--------------玩家出牌--------------");
                 System.out.println("出牌：" + this.outCards.getCards());
                 System.out.println("类型：" + Card.getType(this.outCards.getCards()));
                 System.out.println("上手：" + this.foreCards.getCards());
                 System.out.println("上手类型：" + Card.getType(this.foreCards.getCards()));
-                this.outCards(1, this.selectedCards);
+
+                this.outPlayerCards(this.selectedCards);
+                this.foreCards = new Card(this.outCards.getCards());
+                this.outPower++;
+                this.lastOut = 1;
+                this.passNum = 0;
+
+                // 触发电脑出牌
+                playerComOut();
+
             } else {
-                System.out.println("--------------出牌不符合规则--------------");
+                System.out.println("上一手牌是：" + this.foreCards.getCards());
+                System.out.println("想要出：" + this.outCards.getCards() + "？");
+                System.out.println("出牌不符合规则!!!!!!!!!");
                 // 将所有选中的牌在牌原来的位置上向下移动5个像素
                 for (int i = 0; i < this.selectedCardsIndex.size(); i++) {
                     panel_player.getComponent(this.selectedCardsIndex.get(i)).setLocation(
@@ -742,42 +843,6 @@ public class GamePage extends javax.swing.JFrame {
                 selectedCards = new Card(new ArrayList<>());
                 selectedCardsIndex = new ArrayList<>();
             }
-
-        } else {
-            // 电脑出牌
-            System.out.println("----------------电脑出牌----------------");
-            // 选取一张能出的牌，如果不能找到能出的牌，则牌权不变
-            boolean findOutAble = false;
-            for (int i = 0; i < this.player2Card.getCardNum(); i++) {
-                this.outCards = new Card(new ArrayList<>(Collections.singletonList(
-                        this.player2Card.getCards().get(i))));
-                if (Card.compare(this.outCards.getCards(), this.foreCards.getCards())) {
-                    findOutAble = true;
-                    break;
-                }
-            }
-            if (findOutAble) {
-                if (outPower == 2) {
-                    this.outCards = new Card(new ArrayList<>(Collections.singletonList(
-                            this.player2Card.getCards().get(this.player2Card.getCardNum() - 1))));
-                    this.outCards(2, this.outCards);
-                    if (this.player2Card.getCardNum() == 0) {
-                        System.out.println("电脑1获胜");
-                        // TODO: 写一个弹窗，显示电脑1获胜
-                        // 退出游戏
-                        System.exit(0);
-                    }
-                } else {
-                    this.outCards = new Card(new ArrayList<>(Collections.singletonList(
-                            this.player3Card.getCards().get(this.player3Card.getCardNum() - 1))));
-                    this.outCards(3, this.outCards);
-                    if (this.player3Card.getCardNum() == 0) {
-                        System.out.println("电脑2获胜");
-                        System.exit(0);
-                    }
-                }
-            }
-
         }
 
 
@@ -787,7 +852,7 @@ public class GamePage extends javax.swing.JFrame {
      * 不出事件
      */
     private void button_passActionPerformed(java.awt.event.ActionEvent evt) {
-        System.out.println("--------------不出--------------");
+        System.out.println("不出");
         // 将选中的牌向下移动5个像素
         for (int i = 0; i < this.selectedCardsIndex.size(); i++) {
             panel_player.getComponent(this.selectedCardsIndex.get(i)).setLocation(
@@ -799,6 +864,18 @@ public class GamePage extends javax.swing.JFrame {
         this.panel_player.repaint();
         this.selectedCards = new Card(new ArrayList<>());
         this.selectedCardsIndex = new ArrayList<>();
+
+        // 更新逻辑
+        this.outPower++;
+        checkOutPlayer(++this.passNum);
+        if (this.passNum == 2) {
+            this.foreCards = new Card(new ArrayList<>());
+
+            outPower = lastOut;
+            playerComOut();
+        } else {
+            playerComOut();
+        }
     }
 
     /**
@@ -849,14 +926,19 @@ public class GamePage extends javax.swing.JFrame {
     }
 
     ////////////////////////// 逻辑变量 //////////////////////////
+    /////// 游戏进程
     private int outPower;   // 出牌权
-    private Card player1Card;   // 玩家手牌
+    private int lastOut; // 最后一个出牌的人
+    private int passNum;    // 连续不出的人数
+    /////// 电脑方面
     private Card player2Card;   // 电脑玩家手牌
     private Card player3Card;   // 电脑玩家手牌
-    private Card selectedCards; // 选中的牌
-    private ArrayList<Integer> selectedCardsIndex; // 选中的牌的序号
     private Card foreCards; // 上一次出的牌
     private Card outCards;  // 出的牌
+    /////// 玩家方面
+    private Card player1Card;   // 玩家手牌
+    private Card selectedCards; // 选中的牌
+    private ArrayList<Integer> selectedCardsIndex; // 选中的牌的序号
 
     ////////////////////////// 窗体大小定义 //////////////////////////
     private int sizeTopImageHeight;  // 顶部图片高度

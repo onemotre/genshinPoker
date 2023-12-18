@@ -51,6 +51,10 @@ public class CardTest {
         String cardCompareResult = new CardTest().testCardCompare();
         System.out.println(cardCompareResult);
 
+        ///////////////////// 测试自动出牌 ////////////////////
+        System.out.println("--------------- 测试自动出牌 ---------------");
+        String cardFindAble = new CardTest().testFindOutAble();
+        System.out.println(cardFindAble);
     }
 
     /**
@@ -306,20 +310,91 @@ public class CardTest {
             foreCards = new ArrayList<>(Arrays.asList(i * 10 + 3));
             Card foreCard = new Card(foreCards);
             if (card.findOutAble(foreCard).getCardNum() != 1) {
-                return "单张1出牌错误";
+                return "单张able出牌错误";
             }
         }
         foreCards = new ArrayList<>(Arrays.asList(141));
         Card forCard = new Card(foreCards);
         if (card.findOutAble(forCard).getCardNum() != 0) {
-            return "单张2出牌错误";
+            return "单张unable出牌错误";
         }
         // 2. 对子
         foreCards = new ArrayList<>(Arrays.asList(93, 94));
         forCard = new Card(foreCards);
         if (card.findOutAble(forCard).getCardNum() != 2) {
-            return "对子出牌错误";
+            return "对子able出牌错误";
+        }
+        foreCards = new ArrayList<>(Arrays.asList(23, 24));
+        forCard = new Card(foreCards);
+        if (card.findOutAble(forCard).getCardNum() != 0) {
+            return "对子unable出牌错误";
+        }
+        // 3. 三张
+        foreCards = new ArrayList<>(Arrays.asList(93, 94, 92));
+        forCard = new Card(foreCards);
+        if (card.findOutAble(forCard).getCardNum() != 3) {
+            return "三张able出牌错误";
+        }
+        foreCards = new ArrayList<>(Arrays.asList(12, 13, 14));
+        forCard = new Card(foreCards);
+        if (card.findOutAble(forCard).getCardNum() != 0) {
+            return "三张unable出牌错误";
+        }
+        // 4. 三带一
+        foreCards = new ArrayList<>(Arrays.asList(93, 94, 95, 32));
+        forCard = new Card(foreCards);
+        Card outCard = card.findOutAble(forCard);
+        if (outCard.getCardNum() != 4) {
+            return "出牌：" + outCard.getCards() + "\n" + "三带一able出牌错误";
+        }
+        foreCards = new ArrayList<>(Arrays.asList(13, 14, 15, 32));
+        forCard = new Card(foreCards);
+        outCard = card.findOutAble(forCard);
+        if (Card.getType(outCard.getCards()) != 10 && outCard.getCardNum() != 0) {
+            return "三带一unable出牌错误";
+        }
+        // 5. 三带二
+        foreCards = new ArrayList<>(Arrays.asList(93, 94, 95, 32, 33));
+        forCard = new Card(foreCards);
+        outCard = card.findOutAble(forCard);
+        if (outCard.getCardNum() != 5) {
+            return "出牌：" + outCard.getCards() + "\n" + "三带二able出牌错误";
+        }
+        foreCards = new ArrayList<>(Arrays.asList(13, 14, 15, 32, 32));
+        forCard = new Card(foreCards);
+        outCard = card.findOutAble(forCard);
+        if (Card.getType(outCard.getCards()) != 10 && outCard.getCardNum() != 0) {
+            return "三带二unable出牌错误";
+        }
+        // 6. 四带二
+        foreCards = new ArrayList<>(Arrays.asList(92, 93, 94, 95, 32, 33));
+        forCard = new Card(foreCards);
+        outCard = card.findOutAble(forCard);
+        if (outCard.getCardNum() == 0) {
+            return "出牌：" + outCard.getCards() + "\n" + "四带二able出牌错误";
+        }
+        foreCards = new ArrayList<>(Arrays.asList(12, 13, 14, 15, 32, 32));
+        forCard = new Card(foreCards);
+        outCard = card.findOutAble(forCard);
+        if (outCard.getCardNum() != 0) {
+            return "四带二unable出牌错误";
         }
 
+        // 7. 炸弹测试
+        // 炸顺子
+        foreCards = new ArrayList<>(Arrays.asList(32,42,52,62,72,82));
+        forCard = new Card(foreCards);
+        outCard = card.findOutAble(forCard);
+        if (outCard.getCardNum() == 0) {
+            return "出牌：" + outCard.getCards() + "\n" + "炸弹able出牌错误";
+        }
+        // 炸炸弹
+        foreCards = new ArrayList<>(Arrays.asList(12, 13, 14, 15));
+        forCard = new Card(foreCards);
+        outCard = card.findOutAble(forCard);
+        if (outCard.getCardNum() != 0) {
+            return "炸弹unable出牌错误";
+        }
+        return "自动出牌测试通过";
     }
 }

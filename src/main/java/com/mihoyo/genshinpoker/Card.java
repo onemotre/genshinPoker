@@ -28,7 +28,7 @@ public class Card {
     public Card findOutAble( Card _foreCards) {
         int foreType = Card.getType(_foreCards.getCards());
         // 特殊情况考虑
-        if (foreType == 7 || foreType == 8 || foreType == 9 || foreType == 11) {
+        if (foreType == 9 || foreType == 11) {
             // 顺子、连对、飞机、王炸都不出
             return new Card(new ArrayList<>());
         } else if (foreType == -1) {
@@ -39,12 +39,12 @@ public class Card {
             // 需要遍历已有牌组的情况
             if (foreType == 1) {
                 // 单张
-                for (int i = 0; i < this.cards.size(); i++) {
+                for (Integer card : this.cards) {
                     Card compareCard = new Card(new ArrayList<>(Collections.singletonList(
-                            this.cards.get(i))));
+                            card)));
                     if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
                         return new Card(new ArrayList<>(Collections.singletonList(
-                                this.cards.get(i))));
+                                card)));
                     }
                 }
                 return new Card(new ArrayList<>());
@@ -83,6 +83,9 @@ public class Card {
                             compareCard.addCard(this.cards.get(j));
                             if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
                                 return compareCard;
+                            } else {
+                                compareCard = new Card(new ArrayList<>(Arrays.asList(
+                                        this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2))));
                             }
                         }
 
@@ -99,11 +102,17 @@ public class Card {
                             if (j == i || j == i + 1 || j == i + 2) {
                                 continue;
                             }
+                            if (j +1 == i || j +1 == i + 1 || j +1 == i + 2) {
+                                continue;
+                            }
                             if (Card.getType(new ArrayList<>(Arrays.asList(this.cards.get(j), this.cards.get(j + 1)))) == 2) {
                                 compareCard.addCard(this.cards.get(j));
                                 compareCard.addCard(this.cards.get(j + 1));
                                 if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
                                     return compareCard;
+                                } else {
+                                    compareCard = new Card(new ArrayList<>(Arrays.asList(
+                                            this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2))));
                                 }
                             }
                         }
@@ -115,7 +124,7 @@ public class Card {
                 for (int i = 0; i < this.cards.size() - 3; i++) {
                     Card compareCard = new Card(new ArrayList<>(Arrays.asList(
                             this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2), this.cards.get(i + 3))));
-                    if (Card.getType(compareCard.getCards()) == 3) {
+                    if (Card.getType(compareCard.getCards()) == 10) {
                         for (int j = 0; j < this.cards.size() - 1; j++) {
                             if (j == i || j == i + 1 || j == i + 2 || j == i + 3) {
                                 continue;
@@ -126,11 +135,23 @@ public class Card {
                                 if (Card.compare(compareCard.getCards(), _foreCards.getCards())) {
                                     return compareCard;
                                 }
+                                compareCard.deleteCard(5);
+                                compareCard.deleteCard(4);
                             }
                         }
                     }
                 }
                 return new Card(new ArrayList<>());
+            } else if (foreType == 10) {
+                // 拼炸弹
+                for (int i = 0; i < this.cards.size() - 3; i++) {
+                    Card compareCard = new Card(new ArrayList<>(Arrays.asList(
+                            this.cards.get(i), this.cards.get(i + 1), this.cards.get(i + 2), this.cards.get(i + 3))));
+                    if (Card.getType(compareCard.getCards()) == 10 &&
+                            Card.compare(compareCard.getCards(), _foreCards.getCards())) {
+                        return compareCard;
+                    }
+                }
             } else {
                 // 是否有炸弹
                 for (int i = 0; i < this.cards.size() - 3; i++) {
@@ -143,6 +164,7 @@ public class Card {
                 return new Card(new ArrayList<>());
             }
         }
+        return new Card(new ArrayList<>());
     }
 
     //////////////////////// 静态方法 ////////////////////////
@@ -181,17 +203,17 @@ public class Card {
         } else if (type1 == 4) {
             // 三带一
             ArrayList<ArrayList<Integer>> cards1 = manageCards(_cards1);
-            ArrayList<ArrayList<Integer>> cards2 = manageCards(_cards1);
+            ArrayList<ArrayList<Integer>> cards2 = manageCards(_cards2);
             return compareCode(cards1.get(0).get(0), cards2.get(0).get(0));
         } else if (type1 == 5) {
             // 三带二
             ArrayList<ArrayList<Integer>> cards1 = manageCards(_cards1);
-            ArrayList<ArrayList<Integer>> cards2 = manageCards(_cards1);
+            ArrayList<ArrayList<Integer>> cards2 = manageCards(_cards2);
             return compareCode(cards1.get(0).get(0), cards2.get(0).get(0));
         } else if (type1 == 6) {
             // 四带二
             ArrayList<ArrayList<Integer>> cards1 = manageCards(_cards1);
-            ArrayList<ArrayList<Integer>> cards2 = manageCards(_cards1);
+            ArrayList<ArrayList<Integer>> cards2 = manageCards(_cards2);
             return compareCode(cards1.get(0).get(0), cards2.get(0).get(0));
         } else if (type1 == 7) {
             // 顺子
@@ -317,9 +339,21 @@ public class Card {
             } else {
                 // 判断是否为飞机
                 // TODO: 飞机判断解释不一，按照连续两个或者两个个以上数字相同的三张牌组成的牌型（如333444）为准
-                for (int i = 0; i < cards.size() - 1; i++) {
+                for (int i = 0; i < cards.size(); i++) {
                     if (cards.get(i).size() != 3 || cards.get(i + 1).size() != 3) {
-                        return 9;
+                        return 0;
+                    } else {
+                        // 判断是否为连续的三张牌
+                        if (cards.get(i).get(0) / 10 + 1 != cards.get(i + 1).get(0) / 10) {
+                            return 0;
+                        } else {
+                            // 判断是否带有两个单牌
+                            if (cards.size() == 4) {
+                                return 9;
+                            } else {
+                                return 0;
+                            }
+                        }
                     }
                 }
                 return 0;
