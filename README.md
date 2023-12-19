@@ -8,7 +8,7 @@
 
 ![玩家出牌](./pic/playerOut.png)
 
-~[对手出牌](./pic/playerComOut.png)
+![对手出牌](./pic/playerComOut.png)
 
 ## 运行说明
 
@@ -46,5 +46,4 @@ mvn clean install
 ```bash
 java -jar target/classes/com/mihoyo/genshinpoker/GamePage.jar   
 ```
-
 
