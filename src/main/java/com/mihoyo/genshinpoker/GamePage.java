@@ -440,6 +440,9 @@ public class GamePage extends javax.swing.JFrame {
         panel_player = new javax.swing.JPanel();
         panel_cardPool = new javax.swing.JPanel();
         panel_operateArea = new javax.swing.JPanel();
+        label_log = new javax.swing.JLabel();
+
+        this.log = new ArrayList<>();
 
         // 渲染卡组
         // 玩家
@@ -507,6 +510,11 @@ public class GamePage extends javax.swing.JFrame {
         getContentPane().add(panel_cardPool, new org.netbeans.lib.awtextra.AbsoluteConstraints(
                 this.sizePlayerComWidth, this.sizeTopImageHeight,
                 this.sizeCardPoolWidth, this.sizeCardPoolHeight));
+
+        label_log.setBounds(this.sizeFrameWidth / 2 - 15, this.sizeTopImageHeight,
+                30, 30);
+        label_log.setOpaque(false);
+        panel_cardPool.add(label_log, BorderLayout.CENTER);
 
         // 背景渲染
         label_topImage.setIcon(this.iconTopImage);
@@ -582,6 +590,22 @@ public class GamePage extends javax.swing.JFrame {
         System.out.println("电脑手牌更新成功");
         return panel_playerCom;
     }
+    /**
+     * 更新log
+     */
+    private void updateLog() {
+        // 更新log
+        // 什么傻逼操作，居然是html????? 不愧是依托史
+        // <html><body><p align=\"center\">text<br/>next Text</p></body></html>
+        StringBuilder logMessage = new StringBuilder("<html><body><p align=\\\"center\\\">");
+        for (int i = (Math.max(this.log.size() - 5, 0)); i < this.log.size(); i++) {
+            logMessage.append(this.log.get(i)).append("<br/>");
+        }
+        logMessage.append("</p></body></html>");
+        this.label_log.setText(logMessage.toString());
+        this.label_log.setFont(new Font("微软雅黑", Font.BOLD, 20));
+        this.panel_cardPool.add(this.label_log);
+    }
 
     /**
      * 出牌逻辑
@@ -634,15 +658,16 @@ public class GamePage extends javax.swing.JFrame {
 
         if (_player == 1) {
             // 清除原cardPool page_end处的所有组件
-            this.panel_cardPool.removeAll();
+            // this.panel_cardPool.removeAll();
             panel_cardPool.add(panel_cardOut, BorderLayout.PAGE_END);
         } else if(_player == 2){
-            this.panel_cardPool.removeAll();
+            // this.panel_cardPool.removeAll();
             panel_cardPool.add(panel_cardOut, BorderLayout.WEST);
         } else {
-            this.panel_cardPool.removeAll();
+            // this.panel_cardPool.removeAll();
             panel_cardPool.add(panel_cardOut, BorderLayout.EAST);
         }
+
         panel_cardPool.revalidate();
         panel_cardPool.repaint();
     }
@@ -672,8 +697,6 @@ public class GamePage extends javax.swing.JFrame {
 
     /**
      * 判断现在谁出牌
-     * @param _passNum
-     * @return
      */
     private void checkOutPlayer(int _passNum) {
         if (_passNum == 2) {
@@ -681,9 +704,15 @@ public class GamePage extends javax.swing.JFrame {
             if (this.lastOut == 1) {
             } else if (this.lastOut == 2) {
                 this.outPower = 2;
+                this.panel_cardPool.removeAll();
+                this.panel_cardPool.revalidate();
+                this.panel_cardPool.repaint();
                 playerComOut();
             } else if (this.lastOut == 3) {
                 this.outPower = 3;
+                this.panel_cardPool.removeAll();
+                this.panel_cardPool.revalidate();
+                this.panel_cardPool.repaint();
                 playerComOut();
             } else {
                 System.out.println("出牌错误");
@@ -692,6 +721,8 @@ public class GamePage extends javax.swing.JFrame {
             if (this.outPower % 3 == 1) {
                 // 玩家出牌
                 System.out.println("--------------玩家出牌--------------");
+                this.log.add("--------------玩家出牌--------------");
+                updateLog();
             } else {
                 playerComOut();
             }
@@ -708,20 +739,26 @@ public class GamePage extends javax.swing.JFrame {
             if (this.outPower % 3 == 2) {
                 // playerCard2
                 System.out.println("----------------电脑1出牌----------------");
+                this.log.add("----------------电脑1出牌----------------");
+
                 outCard = this.player2Card.findOutAble(this.foreCards);
                 if (outCard.getCards().size() == 0) {
                     // 不出
                     System.out.println("电脑1不出");
+                    this.log.add("电脑1不出");
+                    updateLog();
                     this.outPower++;
                     checkOutPlayer(++this.passNum);
                     playerComOut();
                 } else {
                     // 出牌
                     System.out.println("电脑1出牌：" + outCard.getCards());
+                    this.log.add("电脑1出牌：" + outCard.getCards());
+                    updateLog();
                     // 在this.player2Card中删除这些牌
                     this.player2Card.removeCards(outCard.getCards());
                     // 更新电脑玩家1的牌组
-                    this.panel_playerCom1.removeAll();
+                    // this.panel_playerCom1.removeAll();
                     System.out.println("电脑2剩余手牌：" + this.player3Card.getCards().size());
                     this.panel_playerCom1 = updateComPanel(this.player2Card);
                     panel_playerCom1.revalidate();
@@ -733,6 +770,7 @@ public class GamePage extends javax.swing.JFrame {
                     getContentPane().setComponentZOrder(panel_playerCom1, 0);
                     if (this.player2Card.getCardNum() == 0) {
                         System.out.println("电脑1胜利");
+                        this.log.add("电脑1胜利");
                         System.exit(0);
                     }
 
@@ -753,16 +791,21 @@ public class GamePage extends javax.swing.JFrame {
             } else if (this.outPower % 3 == 0) {
                 // playerCard3
                 System.out.println("----------------电脑2出牌----------------");
+                this.log.add("----------------电脑2出牌----------------");
                 outCard = this.player3Card.findOutAble(this.foreCards);
                 if (outCard.getCards().size() == 0) {
                     // 不出
                     System.out.println("电脑2不出");
+                    this.log.add("电脑2不出");
+                    updateLog();
                     this.outPower++;
                     checkOutPlayer(++this.passNum);
                     playerComOut();
                 } else {
                     // 出牌
                     System.out.println("电脑2出牌：" + outCard.getCards());
+                    this.log.add("电脑2出牌：" + outCard.getCards());
+                    updateLog();
                     // 在this.player3Card中删除这些牌
                     this.player3Card.removeCards(outCard.getCards());
                     // 更新电脑玩家2的牌组
@@ -797,6 +840,8 @@ public class GamePage extends javax.swing.JFrame {
                 }
             } else {
                 System.out.println("--------------玩家出牌--------------");
+                this.log.add("--------------玩家出牌--------------");
+                updateLog();
             }
     }
 
@@ -988,6 +1033,7 @@ public class GamePage extends javax.swing.JFrame {
     private javax.swing.ImageIcon iconCardBack; // 牌背面
     private javax.swing.ImageIcon iconButton; // 按钮
     private javax.swing.ImageIcon icon;
+    private ArrayList<String> log;
 
     ////////////////////////// 组件 //////////////////////////
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1001,4 +1047,5 @@ public class GamePage extends javax.swing.JFrame {
     private javax.swing.JPanel panel_player;
     private javax.swing.JPanel panel_playerCom1;
     private javax.swing.JPanel panel_playerCom2;
+    private javax.swing.JLabel label_log;
 }
